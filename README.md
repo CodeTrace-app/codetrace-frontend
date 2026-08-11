@@ -10,6 +10,8 @@
 [![LikeLion](https://img.shields.io/badge/멋쟁이사자처럼-14기_해커톤-FF7F00?style=flat-square)]()
 [![Backend](https://img.shields.io/badge/Backend-Repo-blue?style=flat-square)](https://github.com/CodeTrace-app/codetrace-backend)
 
+### 🔗 [서비스 바로가기](https://codetrace-frontend.vercel.app)
+
 </div>
 
 ---
@@ -62,7 +64,11 @@ npm run dev               # http://localhost:5173
 백엔드 주소는 `.env`의 `VITE_API_URL`로 주입한다 (하드코딩 금지):
 
 ```
+# 로컬 백엔드를 띄운 경우
 VITE_API_URL=http://localhost:8000
+
+# 배포된 백엔드를 쓰는 경우 (백엔드 설치 없이 프론트만 개발할 때)
+VITE_API_URL=https://codetrace-backend-hq4u.onrender.com
 ```
 
 API 응답 형식은 백엔드 레포 **docs/api-spec.md**가 유일한 기준.
