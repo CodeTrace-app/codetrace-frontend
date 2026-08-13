@@ -1,0 +1,52 @@
+/* 공용 버튼. 화면마다 따로 만들지 않는다.
+ *
+ *   <button className="button button--primary">코드 탐색기 열기</button>
+ *   <button className="button button--secondary">재인덱싱</button>
+ *
+ * 데모 세션에서 막아야 하는 버튼은 숨기지 말고 disabled + title로 이유를 붙인다.
+ */
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  font: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.button--primary {
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+}
+
+.button--primary:hover:not(:disabled) {
+  background: var(--color-primary-hover);
+}
+
+.button--secondary {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.button--secondary:hover:not(:disabled) {
+  background: var(--color-surface-subtle);
+}
+
+/* 폼 제출처럼 가로를 꽉 채워야 하는 자리 */
+.button--block {
+  width: 100%;
+  padding: var(--space-3);
+}

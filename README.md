@@ -10,7 +10,7 @@
 [![LikeLion](https://img.shields.io/badge/멋쟁이사자처럼-14기_해커톤-FF7F00?style=flat-square)]()
 [![Backend](https://img.shields.io/badge/Backend-Repo-blue?style=flat-square)](https://github.com/CodeTrace-app/codetrace-backend)
 
-### 🔗 [서비스 바로가기](https://codetrace-frontend.vercel.app)
+### 🔗 [서비스 바로가기](https://codetrace-frontend.vercel.app) · [API 문서](https://codetrace-backend-hq4u.onrender.com/docs)
 
 </div>
 
@@ -30,11 +30,13 @@ Monaco Editor · React Router
 📦 frontend
 ├── public/
 ├── src/
-│   ├── pages/           ← 화면 8개 (아래 표)
-│   ├── components/      ← 재사용 컴포넌트
-│   ├── api/             ← API 호출 (VITE_API_URL 주입)
+│   ├── pages/           ← 화면 9개 (아래 표)
+│   ├── components/      ← 공통 레이아웃·재사용 컴포넌트
+│   ├── api/             ← 타입·엔드포인트·클라이언트·세션 저장
+│   ├── auth/            ← 로그인 상태와 화면 보호
+│   ├── mocks/           ← api-spec 예시 JSON (VITE_USE_MOCK)
 │   ├── hooks/
-│   ├── styles/
+│   ├── styles/          ← tokens.css (색·간격·타이포)
 │   ├── utils/
 │   └── App.tsx          ← 라우팅
 ├── .env.example
@@ -46,12 +48,18 @@ Monaco Editor · React Router
 | 경로 | 화면 | 우선순위 |
 |:---|:---|:---:|
 | `/` | 랜딩 | P0 |
-| `/login` `/signup` | 로그인 / 회원가입→조직 생성 | P0 |
+| `/login` `/signup` | 로그인 / 회원가입 | P0 |
+| `/signup/organization` | 조직 생성 (가입 직후) | P0 |
 | `/dashboard` | 대시보드 (레포 카드 + 인덱싱 상태) | P0 |
 | `/explorer` | **코드 탐색기 (3분할·제품 핵심)** | P0 |
 | `/pricing` | 요금제 | P1 |
-| `/integrations` | 연동 설정 | P1 |
+| `/settings/integrations` | 연동 설정 | P1 |
 | `/admin` | 관리자 설정 | P2 |
+| `/pr-warnings` | PR 경고 이력 | P2 |
+
+헤더(`Layout`)는 모든 화면에 있다. **로그인 전에는 요금제·로그인·회원가입만** 보이고,
+로그인 후에 전체 메뉴가 나온다 (관리자 설정은 `admin`에게만).
+로그인이 필요한 화면은 `RequireAuth`가 감싼다 — 데모 세션도 같은 경로를 지난다.
 
 ## 🚀 실행 방법
 
@@ -71,8 +79,16 @@ VITE_API_URL=http://localhost:8000
 VITE_API_URL=https://codetrace-backend-hq4u.onrender.com
 ```
 
-API 응답 형식은 백엔드 레포 **docs/api-spec.md**가 유일한 기준.
+API 응답 형식은 백엔드 레포 **[docs/api-spec.md](https://github.com/CodeTrace-app/codetrace-backend/blob/develop/docs/api-spec.md)** 가 유일한 기준.
 API 미완성 구간은 명세의 예시 JSON을 목데이터로 복사해 동작시킨다.
+
+```
+# 백엔드 없이 목데이터로 화면을 개발할 때
+VITE_USE_MOCK=true
+```
+
+목데이터는 `src/mocks/`에 모으고, 컴포넌트에 하드코딩하지 않는다.
+`src/api/client.ts`가 이 값을 보고 목/실제를 전환하므로 화면별로 하나씩 실제 API로 옮길 수 있다.
 
 ## 🌿 브랜치 전략
 
@@ -94,11 +110,11 @@ API 미완성 구간은 명세의 예시 JSON을 목데이터로 복사해 동�
 
 ## 👥 팀원
 
-| 이름 | 역할 | GitHub |
+| 역할 | 담당 | GitHub |
 |:---:|:---:|:---:|
-|  | 프론트 A (탐색기·대시보드) |  |
-|  | 프론트 B (랜딩·인증·설정) |  |
-|  | 디자인 |  |
+| 프론트 A (탐색기·대시보드) | | [@hyorees](https://github.com/hyorees) |
+| 프론트 B (랜딩·인증·설정·공통) | | [@simms0922](https://github.com/simms0922) |
+| 디자인 | | [@YeonJi0201](https://github.com/YeonJi0201) |
 
 ---
 
