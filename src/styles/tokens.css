@@ -10,21 +10,24 @@
 
 :root {
   /* ── 중립색 ─────────────────────────────────────────────── */
-  --color-bg: #f6f7f9;
+  --color-bg: #f4f5f7;
   --color-surface: #ffffff;
   --color-surface-subtle: #f1f3f5;
-  --color-border: #e2e5ea;
+  --color-border: #e4e6ea;
   --color-border-strong: #c9cfd8;
 
-  --color-text: #16191d;
-  --color-text-muted: #5b636e;
-  --color-text-subtle: #868e9a;
+  --color-text: #1a1d21;
+  --color-text-muted: #6b7280;
+  --color-text-subtle: #9ca3af;
   --color-text-inverse: #ffffff;
 
   /* ── 브랜드 ─────────────────────────────────────────────── */
-  --color-primary: #2f6feb;
-  --color-primary-hover: #2559c4;
-  --color-primary-subtle: #eaf1fe;
+  --color-primary: #2563eb;
+  --color-primary-hover: #1d4ed8;
+  --color-primary-subtle: #e8f0fe;
+
+  /* 코드뷰어에서 선택된 함수 범위를 덮는 배경 */
+  --color-code-highlight: #eaf1fd;
 
   /* ── 상태 ───────────────────────────────────────────────── */
   --color-success: #1a7f43;
@@ -37,24 +40,34 @@
   /* ── 연결 유형 (api-spec §4 edge.type 4가지) ──────────────
    * 색만으로 구분하지 않는다. 카드에 유형명을 글자로 함께 쓰고 범례를 둔다
    * (색맹·흑백 출력 대응). 색은 보조 수단이다.
+   *
+   * -subtle은 카드 배경, 그냥 이름은 좌측 테두리·범례 점에 쓴다.
    */
-  --color-ref-call: #2f6feb;
-  --color-ref-call-subtle: #eaf1fe;
-  --color-ref-import: #7c4dcc;
-  --color-ref-import-subtle: #f1ebfb;
-  --color-ref-constant: #1a7f43;
-  --color-ref-constant-subtle: #e6f4ec;
+  --color-ref-call: #6366f1;
+  --color-ref-call-subtle: #eef0fd;
+  --color-ref-import: #2563eb;
+  --color-ref-import-subtle: #e8f0fe;
+  --color-ref-constant: #16a34a;
+  --color-ref-constant-subtle: #e9f7ee;
+  /* 클래스 상속은 시안 범례에 없다 (P3). 나머지 셋과 겹치지 않는 색으로만 잡아둔다 */
   --color-ref-inheritance: #0f7b8a;
   --color-ref-inheritance-subtle: #e4f3f5;
 
-  /* 그래프에서 선택된 함수 카드. 연결 유형 어느 것과도 겹치지 않는 색이어야 한다 */
-  --color-selected: #d9730d;
-  --color-selected-subtle: #fdf1e3;
+  /* 그래프에서 선택된 함수 카드. 연결 유형 어느 것과도 겹치지 않아야 한다 */
+  --color-selected: #e07a3f;
+  --color-selected-subtle: #fdf2e9;
 
-  /* ── 인덱싱 상태 (api-spec §3 indexing_status) ───────────── */
-  --color-status-collecting: #2f6feb;
-  --color-status-parsing: #7c4dcc;
-  --color-status-done: #1a7f43;
+  /* 2단계 노드. 시안에서 1단계보다 눌러 칠해 직접 영향과 구분한다 */
+  --color-ref-indirect: #a1937c;
+  --color-ref-indirect-subtle: #f5f2ea;
+
+  /* ── 인덱싱 상태 (api-spec §3 indexing_status) ─────────────
+   * 시안의 레포 카드는 상태를 글자로 쓴다 ("완료" / "파싱 · 67%" / "수집 중 · 커밋 142 / 218").
+   * 색은 그 글자와 진행 막대에 쓴다.
+   */
+  --color-status-collecting: #2563eb;
+  --color-status-parsing: #6366f1;
+  --color-status-done: #16a34a;
   --color-status-failed: #c02626;
 
   /* ── 간격 ───────────────────────────────────────────────── */

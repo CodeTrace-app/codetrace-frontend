@@ -19,20 +19,20 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* 헤더가 없어야 하는 화면 — 레이아웃 밖에 둔다 */}
-          <Route path="/" element={<Landing />} />
-          <Route path="/pricing" element={<Pricing />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
+          {/* 헤더는 모든 화면에 있다. 로그인 전에는 공개 메뉴만 보인다 */}
+          <Route element={<Layout />}>
+            <Route path="/" element={<Landing />} />
+            <Route path="/pricing" element={<Pricing />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
 
-          {/* 가입은 했지만 조직이 없는 상태에서만 들어오는 화면 */}
-          <Route element={<RequireAuth requireOrganization={false} />}>
-            <Route path="/signup/organization" element={<CreateOrganization />} />
-          </Route>
+            {/* 가입은 했지만 조직이 없는 상태에서만 들어오는 화면 */}
+            <Route element={<RequireAuth requireOrganization={false} />}>
+              <Route path="/signup/organization" element={<CreateOrganization />} />
+            </Route>
 
-          {/* 로그인·조직이 있어야 하는 화면. 데모 세션도 여기 들어온다 (읽기 전용) */}
-          <Route element={<RequireAuth />}>
-            <Route element={<Layout />}>
+            {/* 로그인·조직이 있어야 하는 화면. 데모 세션도 여기 들어온다 (읽기 전용) */}
+            <Route element={<RequireAuth />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/explorer" element={<Explorer />} />
               <Route path="/pr-warnings" element={<PrWarnings />} />

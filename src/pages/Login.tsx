@@ -5,6 +5,7 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { login } from '../api/endpoints'
 import { ApiError } from '../api/error'
 import { useAuth } from '../auth/useAuth'
+import '../styles/button.css'
 import '../styles/form.css'
 
 interface LocationState {
@@ -51,8 +52,8 @@ export default function Login() {
   return (
     <div className="auth">
       <form className="auth__card" onSubmit={handleSubmit}>
-        <h1 className="auth__title">로그인</h1>
-        <p className="auth__subtitle">Code Trace</p>
+        <h1 className="auth__title">코드 트레이스</h1>
+        <p className="auth__subtitle">로그인</p>
 
         {error !== null && <p className="auth__error">{error}</p>}
 
@@ -80,11 +81,22 @@ export default function Login() {
           />
         </label>
 
-        <button className="auth__submit" type="submit" disabled={submitting}>
+        <button className="button button--primary button--block" type="submit" disabled={submitting}>
           {submitting ? '확인 중…' : '로그인'}
         </button>
 
-        {/* 회원가입과 별도 화면이고 상호 이동 링크를 둔다. 소셜 로그인·비밀번호 찾기는 범위 밖 */}
+        {/* 시안에는 소셜 로그인 3개가 있지만 범위 밖이다.
+            숨기지 않고 비활성으로 둔다 — 연동 설정의 "준비 중" 카드와 같은 처리다 */}
+        <div className="auth__social">
+          {['G', 'f', ''].map((mark) => (
+            <button key={mark} type="button" className="auth__social-button" disabled>
+              {mark}
+            </button>
+          ))}
+        </div>
+        <p className="auth__social-note">소셜 로그인은 준비 중입니다</p>
+
+        {/* 회원가입과 별도 화면이고 상호 이동 링크를 둔다. 비밀번호 찾기는 범위 밖 */}
         <p className="auth__footer">
           계정이 없으신가요? <Link to="/signup">회원가입</Link>
         </p>

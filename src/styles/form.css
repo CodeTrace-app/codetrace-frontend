@@ -1,35 +1,33 @@
 /* 로그인·회원가입·조직 생성이 함께 쓰는 폼 스타일.
- * 헤더가 없는 화면들이라 카드 하나를 화면 가운데 둔다.
+ * 헤더 아래 남은 영역 가운데에 폼 하나를 둔다 (시안).
  */
 
 .auth {
   display: grid;
   place-items: center;
-  min-height: 100vh;
-  padding: var(--space-5);
-  background: var(--color-bg);
+  /* 100vh를 쓰면 헤더 높이만큼 넘친다. 레이아웃이 준 높이를 그대로 쓴다 */
+  min-height: 100%;
+  padding: var(--space-7) var(--space-5);
+  background: var(--color-surface);
 }
 
 .auth__card {
   width: 100%;
-  max-width: 380px;
-  padding: var(--space-6);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-card);
+  max-width: 340px;
 }
 
 .auth__title {
-  margin-bottom: var(--space-2);
-  font-size: var(--text-xl);
+  margin-bottom: var(--space-1);
+  font-size: var(--text-lg);
   line-height: var(--leading-tight);
+  text-align: center;
 }
 
 .auth__subtitle {
-  margin-bottom: var(--space-5);
+  margin-bottom: var(--space-6);
   color: var(--color-text-muted);
-  font-size: var(--text-base);
+  font-size: var(--text-sm);
+  text-align: center;
 }
 
 .auth__field {
@@ -61,26 +59,7 @@
   border-color: var(--color-primary);
 }
 
-.auth__submit {
-  width: 100%;
-  padding: var(--space-3);
-  border: none;
-  border-radius: var(--radius-sm);
-  background: var(--color-primary);
-  color: var(--color-text-inverse);
-  font: inherit;
-  font-weight: var(--weight-medium);
-  cursor: pointer;
-}
-
-.auth__submit:hover:not(:disabled) {
-  background: var(--color-primary-hover);
-}
-
-.auth__submit:disabled {
-  background: var(--color-border-strong);
-  cursor: not-allowed;
-}
+/* 제출 버튼은 button.css의 .button .button--primary .button--block을 쓴다 */
 
 /* 에러는 화면을 갈아치우지 않고 폼 위에 문구로 띄운다 (에러 화면 노출 금지) */
 .auth__error {
@@ -97,4 +76,35 @@
   text-align: center;
   font-size: var(--text-sm);
   color: var(--color-text-muted);
+}
+
+/* 소셜 로그인은 범위 밖이다. 시안의 자리는 남기되 누를 수 없게 둔다
+ * (연동 설정의 GitLab·Jira·Slack "준비 중" 카드와 같은 처리). */
+.auth__social {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+.auth__social-button {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: var(--color-surface);
+  color: var(--color-text-subtle);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-bold);
+  cursor: not-allowed;
+}
+
+.auth__social-note {
+  margin-top: var(--space-2);
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--color-text-subtle);
 }
