@@ -30,11 +30,13 @@ Monaco Editor · React Router
 📦 frontend
 ├── public/
 ├── src/
-│   ├── pages/           ← 화면 8개 (아래 표)
-│   ├── components/      ← 재사용 컴포넌트
-│   ├── api/             ← API 호출 (VITE_API_URL 주입)
+│   ├── pages/           ← 화면 9개 (아래 표)
+│   ├── components/      ← 공통 레이아웃·재사용 컴포넌트
+│   ├── api/             ← 타입·엔드포인트·클라이언트·세션 저장
+│   ├── auth/            ← 로그인 상태와 화면 보호
+│   ├── mocks/           ← api-spec 예시 JSON (VITE_USE_MOCK)
 │   ├── hooks/
-│   ├── styles/
+│   ├── styles/          ← tokens.css (색·간격·타이포)
 │   ├── utils/
 │   └── App.tsx          ← 라우팅
 ├── .env.example
@@ -46,13 +48,17 @@ Monaco Editor · React Router
 | 경로 | 화면 | 우선순위 |
 |:---|:---|:---:|
 | `/` | 랜딩 | P0 |
-| `/login` `/signup` | 로그인 / 회원가입→조직 생성 | P0 |
+| `/login` `/signup` | 로그인 / 회원가입 | P0 |
+| `/signup/organization` | 조직 생성 (가입 직후) | P0 |
 | `/dashboard` | 대시보드 (레포 카드 + 인덱싱 상태) | P0 |
 | `/explorer` | **코드 탐색기 (3분할·제품 핵심)** | P0 |
 | `/pricing` | 요금제 | P1 |
-| `/integrations` | 연동 설정 | P1 |
+| `/settings/integrations` | 연동 설정 | P1 |
 | `/admin` | 관리자 설정 | P2 |
 | `/pr-warnings` | PR 경고 이력 | P2 |
+
+랜딩·로그인·회원가입은 공통 헤더 **밖**에 둔다. 나머지는 `Layout`이 감싸고
+`RequireAuth`가 로그인·조직 여부를 확인한다 (데모 세션도 같은 경로를 지난다).
 
 ## 🚀 실행 방법
 
