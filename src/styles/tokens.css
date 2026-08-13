@@ -22,16 +22,16 @@
   --color-text-inverse: #ffffff;
 
   /* ── 브랜드 ─────────────────────────────────────────────── */
-  --color-primary: #2563eb;
-  --color-primary-hover: #1d4ed8;
-  --color-primary-subtle: #e8f0fe;
+  --color-primary: #295cca;
+  --color-primary-hover: #1f489f;
+  --color-primary-subtle: #e6f1fb;
 
   /* 코드뷰어에서 선택된 함수 범위를 덮는 배경 */
-  --color-code-highlight: #eaf1fd;
+  --color-code-highlight: #e6f1fb;
 
   /* ── 상태 ───────────────────────────────────────────────── */
-  --color-success: #1a7f43;
-  --color-success-subtle: #e6f4ec;
+  --color-success: #3f9878;
+  --color-success-subtle: #e1f5ee;
   --color-warning: #b45309;
   --color-warning-subtle: #fdf3e4;
   --color-danger: #c02626;
@@ -43,31 +43,27 @@
    *
    * -subtle은 카드 배경, 그냥 이름은 좌측 테두리·범례 점에 쓴다.
    */
-  --color-ref-call: #6366f1;
-  --color-ref-call-subtle: #eef0fd;
-  --color-ref-import: #2563eb;
-  --color-ref-import-subtle: #e8f0fe;
-  --color-ref-constant: #16a34a;
-  --color-ref-constant-subtle: #e9f7ee;
+  --color-ref-call: #888780;
+  --color-ref-call-subtle: #f1efe8;
+  --color-ref-import: #4a7fbe; /* 배경만 시안 값. 테두리는 배경에서 뽑았다 */
+  --color-ref-import-subtle: #e6f1fb;
+  --color-ref-constant: #3f9878; /* 배경만 시안 값. 테두리는 배경에서 뽑았다 */
+  --color-ref-constant-subtle: #e1f5ee;
   /* 클래스 상속은 시안 범례에 없다 (P3). 나머지 셋과 겹치지 않는 색으로만 잡아둔다 */
   --color-ref-inheritance: #0f7b8a;
   --color-ref-inheritance-subtle: #e4f3f5;
 
   /* 그래프에서 선택된 함수 카드. 연결 유형 어느 것과도 겹치지 않아야 한다 */
-  --color-selected: #e07a3f;
-  --color-selected-subtle: #fdf2e9;
-
-  /* 2단계 노드. 시안에서 1단계보다 눌러 칠해 직접 영향과 구분한다 */
-  --color-ref-indirect: #a1937c;
-  --color-ref-indirect-subtle: #f5f2ea;
+  --color-selected: #d85a30;
+  --color-selected-subtle: #faece7;
 
   /* ── 인덱싱 상태 (api-spec §3 indexing_status) ─────────────
    * 시안의 레포 카드는 상태를 글자로 쓴다 ("완료" / "파싱 · 67%" / "수집 중 · 커밋 142 / 218").
    * 색은 그 글자와 진행 막대에 쓴다.
    */
-  --color-status-collecting: #2563eb;
-  --color-status-parsing: #6366f1;
-  --color-status-done: #16a34a;
+  --color-status-collecting: #295cca;
+  --color-status-parsing: #295cca;
+  --color-status-done: #3f9878;
   --color-status-failed: #c02626;
 
   /* ── 간격 ───────────────────────────────────────────────── */
