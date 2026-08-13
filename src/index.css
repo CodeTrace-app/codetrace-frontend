@@ -1,3 +1,5 @@
+@import './styles/tokens.css';
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,6 +7,23 @@
 }
 
 body {
-  font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--color-text);
+  background: var(--color-bg);
+}
+
+/* 심볼명·파일경로·코드는 고정폭으로 쓴다 */
+code,
+pre {
+  font-family: var(--font-mono);
+}
+
+a {
+  color: var(--color-primary);
+}
+
+#root {
+  min-height: 100vh;
 }
