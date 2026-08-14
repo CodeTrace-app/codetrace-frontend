@@ -5,7 +5,7 @@ import { login } from '../api/endpoints';
 import { ApiError } from '../api/error';
 import { useAuth } from '../auth/useAuth';
 import '../styles/button.css'
-import '../styles/form.css'; // PM님이 지정한 form.css 사용!
+import '../styles/form.css';
 
 interface LocationState {
   from?: { pathname: string };

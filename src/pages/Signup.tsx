@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import '../styles/button.css'
-import '../styles/form.css'; // 똑같이 form.css 사용!
+import '../styles/form.css';
 
 export default function Signup() {
   const navigate = useNavigate();
