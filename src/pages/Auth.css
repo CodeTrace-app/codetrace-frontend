@@ -1,0 +1,126 @@
+/* 전체 레이아웃 (데스크탑 고정) */
+.auth-wrapper {
+  width: 1000px;
+  margin: 0 auto;
+  padding: 0 20px;
+  font-family: sans-serif;
+  color: #333;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 네비게이션 헤더 (랜딩과 동일) */
+.auth-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+}
+.logo {
+  font-size: 20px;
+  font-weight: bold;
+  color: #2b5fed;
+  text-decoration: none;
+}
+.nav-links span, .nav-links a, 
+.auth-links span, .auth-links a {
+  margin: 0 15px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none; /* 추가: 링크 밑줄 제거 */
+  color: #333;
+}
+.user-btn {
+  color: #2b5fed;
+}
+
+/* 중앙 폼 컨테이너 */
+.auth-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 0;
+}
+.auth-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+.auth-subtitle {
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 50px;
+}
+
+/* 폼(Form) 스타일 */
+.auth-form {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+}
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
+}
+.input-group label {
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+.input-group input {
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+}
+.input-group input:focus {
+  border-color: #2b5fed;
+}
+
+/* 제출 버튼 */
+.auth-submit-btn {
+  background-color: #2b5fed;
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* 소셜 로그인 (로그인 페이지용) */
+.social-login {
+  margin-top: 30px;
+  text-align: center;
+}
+.social-icons {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+/* 하단 링크 */
+.auth-footer-link {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #666;
+}
+.auth-footer-link span, .back-link {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+  margin-left: 5px;
+}
