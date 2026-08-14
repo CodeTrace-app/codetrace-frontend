@@ -1,114 +1,112 @@
+/* 전체 레이아웃 (데스크탑 고정) */
 .landing-wrapper {
   width: 1000px;
   margin: 0 auto;
   padding: 0 20px;
   font-family: sans-serif;
-  color: #333;
-}
-
-.landing-header {
+  color: var(--color-text); /* 하드코딩 #333 ➡️ 토큰 변경 */
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 0;
-  border-bottom: none;
-}
-.logo {
-  font-size: 20px;
-  font-weight: bold;
-  color: #2b5fed;
-}
-.nav-links span {
-  margin: 0 15px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.auth-links span {
-  margin-left: 20px;
-  cursor: pointer;
-  font-size: 14px;
-}
-.user-btn {
-  color: #2b5fed;
+  flex-direction: column;
 }
 
+/* 1. 히어로 섹션 */
 .hero-section {
   text-align: center;
-  padding: 80px 0;
+  padding: 80px 0 60px;
 }
 .hero-section h1 {
-  font-size: 32px;
+  font-size: 36px;
   margin-bottom: 20px;
 }
 .hero-section p {
   font-size: 16px;
-  color: #666;
+  color: var(--color-text-muted); /* 하드코딩 #666 ➡️ 토큰 변경 */
   margin-bottom: 40px;
+  line-height: 1.6;
 }
-.hero-buttons button {
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+}
+.primary-btn {
+  background-color: var(--color-primary); /* 메인 파란색 토큰 */
+  color: var(--color-surface); /* 배경색(보통 흰색) 토큰 */
   padding: 12px 24px;
-  margin: 0 10px;
-  border-radius: 8px;
   border: none;
-  cursor: pointer;
+  border-radius: 8px;
   font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
-.btn-primary {
-  background-color: #2b5fed;
-  color: white;
+.secondary-btn {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  padding: 12px 24px;
+  border: 1px solid var(--color-border); /* 테두리 회색 토큰 */
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
 }
-.btn-secondary {
-  background-color: #f0f0f0;
-  color: #333;
+.full-width {
+  width: 100%;
 }
 
-.content-section {
-  margin-bottom: 80px;
+/* 2. 섹션 공통 스타일 */
+.content-section, .demo-section {
+  padding: 60px 0;
 }
-.content-section h2 {
-  font-size: 22px;
+.content-section h2, .demo-section h2 {
+  font-size: 24px;
   margin-bottom: 30px;
 }
 
-.card-container {
+/* 카드 UI */
+.card-container, .demo-container {
   display: flex;
   gap: 20px;
 }
 .card {
   flex: 1;
-  padding: 24px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
+  padding: 24px;
 }
-.card-label {
+.card-tag {
+  display: inline-block;
   font-size: 12px;
-  color: #888;
-  display: block;
-  margin-bottom: 10px;
+  color: var(--color-text-muted);
+  margin-bottom: 15px;
 }
 .card h3 {
   font-size: 18px;
   margin-bottom: 15px;
-  margin-top: 0;
 }
 .card p {
   font-size: 14px;
-  color: #666;
+  color: var(--color-text-muted);
   line-height: 1.5;
 }
+.card .sub-text {
+  font-size: 12px;
+  margin-top: 15px;
+  color: #999;
+}
 
+/* 표(스켈레톤) 스타일 */
 .table-container {
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
 }
 .table-header {
   display: flex;
-  background-color: #f9f9f9;
+  background-color: var(--color-surface-subtle, #f9f9f9);
   padding: 15px;
   font-weight: bold;
   font-size: 14px;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid var(--color-border);
 }
 .table-header span {
   flex: 1;
@@ -116,7 +114,7 @@
 .table-row {
   display: flex;
   padding: 15px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
 }
 .table-row:last-child {
   border-bottom: none;
@@ -128,79 +126,52 @@
   align-items: center;
 }
 .skeleton {
-  background-color: #eee;
+  background-color: var(--color-border);
   height: 20px;
   border-radius: 10px;
 }
-
 .skeleton.short { width: 40%; }
 .skeleton.medium { width: 70%; }
 .skeleton.long { width: 90%; }
 
-.demo-container {
-  display: flex;
-  gap: 20px;
-  align-items: stretch;
-}
-.demo-video-card {
+/* 시연 영상 & 데모 카드 */
+.demo-video-card, .demo-repo-card {
   flex: 1;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 24px;
 }
 .video-placeholder {
-  width: 100%;
+  background-color: var(--color-surface-subtle, #f5f5f5);
+  border: 1px solid var(--color-border);
   height: 200px;
-  background-color: #f5f5f5;
-  border: 1px solid #ccc;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #999;
+  color: var(--color-text-muted);
   margin-bottom: 20px;
 }
-.demo-action-card {
-  flex: 1;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
+.demo-section h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
 }
-.demo-action-card h4 {
-  margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 16px;
-}
-.demo-action-card p {
-  color: #666;
+.demo-section p {
   font-size: 14px;
-  line-height: 1.5;
-  margin-bottom: auto;
+  color: var(--color-text-muted);
+  margin-bottom: 20px;
 }
 
-.demo-action-card .btn-primary.full-width {
-  width: 100%;
-  padding: 16px 0;
-  font-size: 16px;
-  font-weight: bold;
-  border-radius: 8px;
-  margin-top: 20px;
-  background-color: #2b5fed;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
+/* 푸터 */
 .landing-footer {
   text-align: center;
   padding: 40px 0;
-  border-top: none;
-  color: #666;
+  color: var(--color-text-muted);
 }
-.landing-footer span {
+.footer-link {
   margin: 0 15px;
   cursor: pointer;
   text-decoration: underline;
   text-underline-offset: 4px;
+  color: var(--color-text);
+  font-weight: bold;
 }
