@@ -1,0 +1,106 @@
+.explorer-container {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  width: 100%;
+  height: calc(100vh - 60px);
+  background-color: #f8f9fa;
+  box-sizing: border-box;
+}
+
+.left-panel,
+.center-panel,
+.right-panel {
+  background: #ffffff;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.left-panel {
+  width: 200px;
+  min-width: 200px;
+}
+
+.panel-header {
+  padding: 16px;
+  font-weight: 700;
+  font-size: 14px;
+  color: #212529;
+}
+
+.panel-content {
+  padding: 0 8px 16px;
+}
+
+.center-panel {
+  flex: 1;
+  min-width: 0;
+}
+
+.file-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #f1f3f5;
+}
+
+.file-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #212529;
+}
+
+.badge {
+  font-size: 12px;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: #f1f3f5;
+  color: #495057;
+}
+
+.right-panel {
+  width: 560px;
+  min-width: 560px;
+}
+
+.tab-header {
+  display: flex;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.tab-button {
+  flex: 1;
+  padding: 12px;
+  background: none;
+  border: none;
+  color: #495057;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-button.active {
+  color: #3b5bdb;
+  border-bottom-color: #3b5bdb;
+}
+
+.tab-content {
+  padding: 20px;
+}
+
+.tab-content h3 {
+  margin-top: 0;
+  font-size: 16px;
+  color: #212529;
+}
+
+.tab-content p {
+  color: #868e96;
+  font-size: 14px;
+}

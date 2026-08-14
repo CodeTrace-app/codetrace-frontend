@@ -1,8 +1,26 @@
+import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import './Landing.css';
 
-const Landing = () => {
+import { startDemo } from '../api/endpoints';
+import { useAuth } from '../auth/useAuth';
+import './Landing.css';
+import '../styles/button.css'; // PM님의 버튼 공통 스타일 추가
+
+export default function Landing() {
+  const { signIn } = useAuth();
   const navigate = useNavigate();
+  const [entering, setEntering] = useState(false);
+
+  // PM님이 짜둔 데모 접속 기능 (클릭 시 가짜 로그인 후 대시보드로 이동)
+  async function handleDemo() {
+    setEntering(true);
+    try {
+      signIn(await startDemo());
+      navigate('/dashboard');
+    } catch {
+      setEntering(false);
+    }
+  }
 
   return (
     <div className="landing-wrapper">
@@ -11,9 +29,13 @@ const Landing = () => {
         <h1>래거시 코드, 이제 맥락까지 이해하세요.</h1>
         <p>커밋-PR 이력을 근거로 코드 작성 배경을 요약하고 영향 범위를 분석합니다. 신규 합류 개발자의 온보딩 시간을 단축하는 개발자 도구입니다.</p>
         <div className="button-group">
-          {/* 버튼 클릭 시 이동 */}
-          <button className="primary-btn" onClick={() => navigate('/explorer')}>
-            데모 체험하기
+          {/* 우리가 만든 버튼 UI에 PM님의 handleDemo 기능 연결 */}
+          <button 
+            className="primary-btn" 
+            onClick={handleDemo}
+            disabled={entering}
+          >
+            {entering ? '준비 중…' : '데모 체험하기'}
           </button>
           <button className="secondary-btn" onClick={() => navigate('/pricing')}>
             요금제 보기
@@ -100,21 +122,23 @@ const Landing = () => {
           <div className="demo-repo-card">
             <h3>데모 레포 체험</h3>
             <p>2년차 커밋 이력이 담긴 샘플 레포를 로그인 없이 바로 탐색해 볼 수 있습니다.</p>
-            {/* 버튼 클릭 시 이동 */}
-            <button className="primary-btn full-width" onClick={() => navigate('/explorer')}>
-              코드 탐색기 바로 열기
+            {/* 여기 있는 버튼도 PM님의 데모 진입 기능으로 변경 */}
+            <button 
+              className="primary-btn full-width" 
+              onClick={handleDemo}
+              disabled={entering}
+            >
+              {entering ? '준비 중…' : '코드 탐색기 바로 열기'}
             </button>
           </div>
         </div>
       </section>
 
-      {/* 6. 푸터 (Link로 페이지 이동) */}
+      {/* 6. 푸터 */}
       <footer className="landing-footer">
         <Link to="/pricing" className="footer-link">요금제 확인</Link>
         <Link to="/login" className="footer-link">로그인</Link>
       </footer>
     </div>
   );
-};
-
-export default Landing;
+}
