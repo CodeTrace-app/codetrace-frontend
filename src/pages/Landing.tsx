@@ -4,14 +4,13 @@ import { useNavigate, Link } from 'react-router-dom';
 import { startDemo } from '../api/endpoints';
 import { useAuth } from '../auth/useAuth';
 import './Landing.css';
-import '../styles/button.css'; // PM님의 버튼 공통 스타일 추가
+import '../styles/button.css';
 
 export default function Landing() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const [entering, setEntering] = useState(false);
 
-  // PM님이 짜둔 데모 접속 기능 (클릭 시 가짜 로그인 후 대시보드로 이동)
   async function handleDemo() {
     setEntering(true);
     try {
@@ -24,12 +23,10 @@ export default function Landing() {
 
   return (
     <div className="landing-wrapper">
-      {/* 1. 최상단 히어로 섹션 */}
       <section className="hero-section">
         <h1>래거시 코드, 이제 맥락까지 이해하세요.</h1>
         <p>커밋-PR 이력을 근거로 코드 작성 배경을 요약하고 영향 범위를 분석합니다. 신규 합류 개발자의 온보딩 시간을 단축하는 개발자 도구입니다.</p>
         <div className="button-group">
-          {/* 우리가 만든 버튼 UI에 PM님의 handleDemo 기능 연결 */}
           <button 
             className="primary-btn" 
             onClick={handleDemo}
@@ -43,7 +40,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 2. 개발팀이 겪는 실제 문제 */}
       <section className="content-section">
         <h2>개발팀이 겪는 실제 문제</h2>
         <div className="card-container">
@@ -65,7 +61,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 3. 핵심 기능 */}
       <section className="content-section">
         <h2>핵심 기능</h2>
         <div className="card-container">
@@ -87,7 +82,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 4. 범용 LLM과 무엇이 다른가 (스켈레톤 UI) */}
       <section className="content-section">
         <h2>범용 LLM과 무엇이 다른가</h2>
         <div className="table-container">
@@ -110,7 +104,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 5. 3분 시연 영상 */}
       <section className="demo-section">
         <h2>3분 시연으로 직접 확인하세요</h2>
         <div className="demo-container">
@@ -122,7 +115,6 @@ export default function Landing() {
           <div className="demo-repo-card">
             <h3>데모 레포 체험</h3>
             <p>2년차 커밋 이력이 담긴 샘플 레포를 로그인 없이 바로 탐색해 볼 수 있습니다.</p>
-            {/* 여기 있는 버튼도 PM님의 데모 진입 기능으로 변경 */}
             <button 
               className="primary-btn full-width" 
               onClick={handleDemo}
@@ -134,7 +126,6 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* 6. 푸터 */}
       <footer className="landing-footer">
         <Link to="/pricing" className="footer-link">요금제 확인</Link>
         <Link to="/login" className="footer-link">로그인</Link>

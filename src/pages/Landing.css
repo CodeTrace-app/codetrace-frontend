@@ -1,11 +1,10 @@
-/* 전체 레이아웃 (데스크탑 고정) */
 .landing-wrapper {
   background-color: var(--color-surface);
   width: 100%;
   margin: 0 auto;
   padding: 0 20px;
   font-family: sans-serif;
-  color: var(--color-text); /* 하드코딩 #333 ➡️ 토큰 변경 */
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
 }
@@ -16,13 +15,12 @@
 .landing-footer {
   width: 100%;
   max-width: 1000px;
-  margin: 0 auto; /* 양옆 여백을 똑같이 나눠서 가운데 정렬 */
+  margin: 0 auto;
   padding-left: 20px;
   padding-right: 20px;
   box-sizing: border-box;
 }
 
-/* 1. 히어로 섹션 */
 .hero-section {
   text-align: center;
   padding: 80px 0 60px;
@@ -33,7 +31,7 @@
 }
 .hero-section p {
   font-size: 16px;
-  color: var(--color-text-muted); /* 하드코딩 #666 ➡️ 토큰 변경 */
+  color: var(--color-text-muted);
   margin-bottom: 40px;
   line-height: 1.6;
 }
@@ -43,8 +41,8 @@
   gap: 15px;
 }
 .primary-btn {
-  background-color: var(--color-primary); /* 메인 파란색 토큰 */
-  color: var(--color-surface); /* 배경색(보통 흰색) 토큰 */
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -56,7 +54,7 @@
   background-color: var(--color-surface);
   color: var(--color-text);
   padding: 12px 24px;
-  border: 1px solid var(--color-border); /* 테두리 회색 토큰 */
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   font-size: 16px;
   font-weight: bold;
@@ -66,7 +64,6 @@
   width: 100%;
 }
 
-/* 2. 섹션 공통 스타일 */
 .content-section, .demo-section {
   padding: 60px 0;
 }
@@ -75,7 +72,6 @@
   margin-bottom: 30px;
 }
 
-/* 카드 UI */
 .card-container, .demo-container {
   display: flex;
   gap: 20px;
@@ -107,7 +103,6 @@
   color: #999;
 }
 
-/* 표(스켈레톤) 스타일 */
 .table-container {
   border: 1px solid var(--color-border);
   border-radius: 8px;
@@ -147,7 +142,6 @@
 .skeleton.medium { width: 70%; }
 .skeleton.long { width: 90%; }
 
-/* 시연 영상 & 데모 카드 */
 .demo-video-card, .demo-repo-card {
   flex: 1;
   border: 1px solid var(--color-border);
@@ -174,7 +168,6 @@
   margin-bottom: 20px;
 }
 
-/* 푸터 */
 .landing-footer {
   text-align: center;
   padding: 40px 0;
