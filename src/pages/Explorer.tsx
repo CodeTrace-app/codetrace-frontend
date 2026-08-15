@@ -4,9 +4,9 @@ import Editor from '@monaco-editor/react';
 import type { TreeNode } from '../api/types';
 import FileTree from '../components/FileTree';
 import ContextTab, { type ContextData } from '../components/ContextTab';
+import ImpactTab, { type ImpactData } from '../components/ImpactTab';
 import './Explorer.css';
 
-// 1. 파일 트리 목(Mock) 데이터 (TreeNode[] 규격 준수)
 const mockTreeData: TreeNode[] = [
   {
     name: 'src',
@@ -29,7 +29,6 @@ const mockTreeData: TreeNode[] = [
   { name: 'README.md', type: 'file', path: 'README.md' },
 ];
 
-// 2. 파일 내용 목(Mock) 인터페이스 및 데이터
 interface MockFileItem {
   path: string;
   language: string | null;
@@ -238,10 +237,87 @@ const mockContextMap: Record<string, ContextData> = {
   },
 };
 
+const mockImpactMap: Record<string, ImpactData> = {
+  'src/auth_service.py::verify_token': {
+    target: {
+      name: 'verify_token',
+      file: 'auth_service.py',
+      githubUrl: 'https://github.com',
+    },
+    step1: [
+      {
+        name: 'authenticate_user',
+        file: 'auth_service.py',
+        relationType: 'call',
+        relationLabel: '함수 호출',
+        refCount: 6,
+      },
+      {
+        name: 'require_login',
+        file: 'middleware.py',
+        relationType: 'call',
+        relationLabel: '함수 호출',
+        refCount: 4,
+      },
+      {
+        name: 'SECRET_KEY',
+        file: 'config.py',
+        relationType: 'const',
+        relationLabel: '전역 상수',
+        refCount: 3,
+      },
+      {
+        name: 'token_utils',
+        file: 'user_service.py',
+        relationType: 'import',
+        relationLabel: 'import',
+        refCount: 2,
+      },
+    ],
+    step2: [
+      {
+        name: 'login_view',
+        file: 'routes.py',
+        relationType: 'call',
+        relationLabel: '함수 호출',
+        refCount: 5,
+      },
+    ],
+  },
+  'src/api/checkout.py::process_payment': {
+    target: {
+      name: 'process_payment',
+      file: 'checkout.py',
+      githubUrl: 'https://github.com',
+    },
+    step1: [
+      { name: 'order_create_view', file: 'order_views.py', relationType: 'call', relationLabel: '함수 호출', refCount: 15 },
+      { name: 'subscription_job', file: 'billing_cron.py', relationType: 'call', relationLabel: '함수 호출', refCount: 12 },
+      { name: 'quick_pay_handler', file: 'easy_checkout.py', relationType: 'call', relationLabel: '함수 호출', refCount: 11 },
+      { name: 'TIMEOUT_SECONDS', file: 'constants.py', relationType: 'const', relationLabel: '전역 상수', refCount: 9 },
+      { name: 'PgClient', file: 'pg/client.py', relationType: 'import', relationLabel: 'import', refCount: 8 },
+      { name: 'refund_payment', file: 'refund_service.py', relationType: 'call', relationLabel: '함수 호출', refCount: 7 },
+      { name: 'validate_card', file: 'card_validator.py', relationType: 'call', relationLabel: '함수 호출', refCount: 6 },
+      { name: 'MAX_RETRY_LIMIT', file: 'constants.py', relationType: 'const', relationLabel: '전역 상수', refCount: 5 },
+      { name: 'log_transaction', file: 'audit_logger.py', relationType: 'call', relationLabel: '함수 호출', refCount: 4 },
+      { name: 'send_receipt_mail', file: 'mailer.py', relationType: 'call', relationLabel: '함수 호출', refCount: 3 },
+      { name: 'calc_vat', file: 'tax_calculator.py', relationType: 'call', relationLabel: '함수 호출', refCount: 2 },
+      { name: 'slack_alert', file: 'slack_webhook.py', relationType: 'call', relationLabel: '함수 호출', refCount: 1 },
+    ],
+    step2: [
+      { name: 'web_entrypoint', file: 'app.py', relationType: 'call', relationLabel: '함수 호출', refCount: 14 },
+      { name: 'celery_worker', file: 'worker.py', relationType: 'call', relationLabel: '함수 호출', refCount: 10 },
+      { name: 'admin_dashboard', file: 'admin.py', relationType: 'call', relationLabel: '함수 호출', refCount: 8 },
+      { name: 'nightly_settle', file: 'settlement.py', relationType: 'call', relationLabel: '함수 호출', refCount: 6 },
+      { name: 'metric_collector', file: 'prometheus.py', relationType: 'call', relationLabel: '함수 호출', refCount: 4 },
+      { name: 'error_sentry', file: 'sentry_setup.py', relationType: 'import', relationLabel: 'import', refCount: 2 },
+    ],
+  },
+};
+
 export default function Explorer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'context' | 'impact'>('context');
-
   const fnParam = searchParams.get('fn') || 'src/auth_service.py::verify_token';
   const currentFilePath = fnParam.includes('::') ? fnParam.split('::')[0] : fnParam;
   const currentFuncName = fnParam.includes('::') ? fnParam.split('::')[1] : '';
@@ -272,6 +348,16 @@ export default function Explorer() {
       evidences: [],
     };
   }
+
+  const impactData: ImpactData = mockImpactMap[fnParam] || {
+    target: {
+      name: currentFuncName || fileData.path.split('/').pop()?.replace('.py', '') || 'unknown',
+      file: fileData.path.split('/').pop() || '',
+      githubUrl: 'https://github.com',
+    },
+    step1: mockImpactMap['src/auth_service.py::verify_token'].step1,
+    step2: mockImpactMap['src/auth_service.py::verify_token'].step2,
+  };
 
   const handleEditorDidMount = (editor: any) => {
     editor.onMouseDown((e: any) => {
@@ -310,12 +396,19 @@ export default function Explorer() {
     setSearchParams(params);
   };
 
+  const handleSelectImpactNode = (filePath: string, funcName?: string) => {
+    const target = funcName ? `src/${filePath}::${funcName}` : `src/${filePath}`;
+    const params = new URLSearchParams(searchParams);
+    params.set('fn', target);
+    setSearchParams(params);
+  };
+
   return (
     <div className="explorer-container">
-      {/* 1. 좌측 파일 탐색기 */}
+      {/* 파일 트리 영역 */}
       <aside className="left-panel">
         <div className="panel-header">
-          <span>파일 탐색기</span>
+          <span>파일 영역</span>
         </div>
         <div className="tree-content">
           <FileTree
@@ -326,7 +419,7 @@ export default function Explorer() {
         </div>
       </aside>
 
-      {/* 2. 중앙 코드 뷰어 */}
+      {/* 코드 뷰어 영역 */}
       <main className="center-panel">
         <div className="center-panel-header">
           <div className="file-info-group">
@@ -375,7 +468,7 @@ export default function Explorer() {
         </div>
       </main>
 
-      {/* 3. 우측 맥락 패널 */}
+      {/* 맥락/영향 범위 영역 */}
       <aside className="right-panel">
         <div className="tab-header">
           <button
@@ -408,9 +501,10 @@ export default function Explorer() {
           )}
 
           {activeTab === 'impact' && (
-            <div className="impact-placeholder">
-              <p>영향 범위 분석 내용이 표시됩니다.</p>
-            </div>
+            <ImpactTab
+              data={impactData}
+              onSelectNode={handleSelectImpactNode}
+            />
           )}
         </div>
       </aside>
