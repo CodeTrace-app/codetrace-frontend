@@ -104,3 +104,17 @@
   color: #868e96;
   font-size: 14px;
 }
+
+.truncated-banner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-warning-text, #856404);
+  background-color: var(--color-warning-bg, #fff3cd);
+  border-bottom: 1px solid var(--color-warning-border, #ffeeba);
+  user-select: none;
+}
