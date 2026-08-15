@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Editor, { type Monaco } from '@monaco-editor/react';
-import { fetchFile } from '../api/endpoints';
-import type { SourceFile, FunctionRange } from '../api/types';
+import { fetchFile, fetchTree } from '../api/endpoints';
+import type { SourceFile, FunctionRange, TreeNode } from '../api/types';
+import FileTree from '../components/FileTree';
 import './Explorer.css';
 
 export default function Explorer() {
@@ -12,6 +13,7 @@ export default function Explorer() {
   const fnParam = searchParams.get('fn') || '';
   const tabParam = (searchParams.get('tab') as 'context' | 'impact') || 'context';
 
+  const [treeData, setTreeData] = useState<TreeNode[]>([]);
   const [fileData, setFileData] = useState<SourceFile | null>(null);
   const [activeTab, setActiveTab] = useState<'context' | 'impact'>(tabParam);
   const [selectedFunctionName, setSelectedFunctionName] = useState<string>('');
@@ -36,15 +38,55 @@ export default function Explorer() {
   }, [fileData]);
 
   useEffect(() => {
-    fetchFile(Number(repoParam), fnParam)
-      .then((data) => {
-        setFileData(data);
+    fetchTree(Number(repoParam))
+      .then((data: any) => {
+        const nodes = Array.isArray(data)
+          ? data
+          : data?.root || data?.children || data?.tree || [];
+
+        setTreeData(nodes);
       })
       .catch((err) => {
-        console.error('파일을 불러오는 중 에러 발생:', err);
+        console.error('트리 불러오기 실패:', err);
+        setTreeData([]);
       });
-  }, [repoParam, fnParam]);
+  }, [repoParam]);
 
+  useEffect(() => {
+    const currentFn = fnParam || 'src/auth_service.py';
+    const pureFilePath = currentFn.includes('::') ? currentFn.split('::')[0] : currentFn;
+
+    fetchFile(Number(repoParam), pureFilePath)
+      .then((data) => {
+        if (data) {
+          setFileData({
+            ...data,
+            path: pureFilePath,
+            content: data.path === pureFilePath 
+              ? data.content 
+              : `// File: ${pureFilePath}\n\n${data.content}`,
+            language: (pureFilePath.endsWith('.md') ? null : (data.language || 'python')) as any,
+            truncated: data.truncated ?? false, 
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('파일 불러오기 실패:', err);
+        setFileData({
+          path: pureFilePath,
+          content: `# ${pureFilePath}\n\n이 파일은 테스트용 내용입니다.`,
+          language: (pureFilePath.endsWith('.md') ? null : 'python') as any,
+          truncated: false,
+          functions: [],
+        });
+      });
+  }, [repoParam, fnParam]); 
+
+  const handleSelectFile = (filePath: string) => {
+    setSelectedFunctionName('');
+    updateUrl(filePath, activeTabRef.current);
+  };
+  
   useEffect(() => {
     if (fnParam.includes('::')) {
       const [, fnName] = fnParam.split('::');
@@ -58,9 +100,7 @@ export default function Explorer() {
     }
   }, [fnParam, searchParams]);
 
-  const updateUrl = (fnName: string, tab: 'context' | 'impact') => {
-    const currentPath = fileDataRef.current?.path || 'src/auth_service.py';
-    const fnValue = fnName ? `${currentPath}::${fnName}` : currentPath;
+  const updateUrl = (fnValue: string, tab: 'context' | 'impact') => {
     setSearchParams(
       {
         repo: repoParam,
@@ -100,7 +140,9 @@ export default function Explorer() {
 
     if (newFnName !== selectedFunctionNameRef.current) {
       setSelectedFunctionName(newFnName);
-      updateUrl(newFnName, activeTabRef.current);
+      const currentPath = fileDataRef.current?.path || fnParam.split('::')[0];
+      const fnValue = newFnName ? `${currentPath}::${newFnName}` : currentPath;
+      updateUrl(fnValue, activeTabRef.current);
     }
   };
 
@@ -119,8 +161,12 @@ export default function Explorer() {
 
   const handleTabChange = (tab: 'context' | 'impact') => {
     setActiveTab(tab);
-    updateUrl(selectedFunctionName, tab);
+    const currentPath = fileDataRef.current?.path || fnParam.split('::')[0];
+    const fnValue = selectedFunctionName ? `${currentPath}::${selectedFunctionName}` : currentPath;
+    updateUrl(fnValue, tab);
   };
+
+  const currentFilePath = fileData?.path || fnParam.split('::')[0];
 
   return (
     <div className="explorer-container">
@@ -128,16 +174,22 @@ export default function Explorer() {
       <aside className="left-panel">
         <div className="panel-header">파일 트리</div>
         <div className="panel-content">
-          <p className="placeholder-text">{fileData?.path || 'src/auth_service.py'}</p>
+          <FileTree
+            data={treeData}
+            selectedPath={currentFilePath}
+            onSelectFile={handleSelectFile}
+          />
         </div>
       </aside>
 
       {/* 코드 뷰어 영역 */}
       <main className="center-panel">
         <div className="file-header">
-          <span className="file-title">{fileData?.path?.split('/').pop() || 'auth_service.py'}</span>
+          <span className="file-title">
+            {fileData?.path?.split('/').pop() || '파일 선택'}
+          </span>
           <span className="badge">읽기 전용</span>
-          {fileData?.language && <span className="badge">{fileData.language}</span>}
+          <span className="badge">{fileData?.language || 'plaintext'}</span>
         </div>
 
         {fileData?.truncated && (
