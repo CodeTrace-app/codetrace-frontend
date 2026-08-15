@@ -1,23 +1,13 @@
 import { useState } from 'react';
-import type { Evidence } from '../api/types';
+import type { FunctionContext } from '../api/types';
 import './ContextTab.css';
 
-export interface ContextData {
-  status: 'ok' | 'no_history' | 'conflicting';
-  function_name?: string;
-  parent_module?: string;
-  summary?: string;
-  evidence_truncated?: boolean;
-  evidences?: Evidence[];
-}
-
 interface ContextTabProps {
-  data: ContextData | any | null;
-  functionName?: string;
+  data: FunctionContext | null;
   onNavigateParent?: (parentPath: string) => void;
 }
 
-export default function ContextTab({ data, functionName, onNavigateParent }: ContextTabProps) {
+export default function ContextTab({ data, onNavigateParent }: ContextTabProps) {
   const [isEvidenceCollapsed, setIsEvidenceCollapsed] = useState(false);
 
   if (!data) {
@@ -28,9 +18,9 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
     );
   }
 
-  const currentStatus = data.status || 'ok';
-  const evidences: Evidence[] = data.evidences || [];
-  const displayName = functionName || (data.function_name ? `${data.function_name}()` : '맥락 상세');
+  const currentStatus = data.status;
+  const evidences = data.evidence || [];
+  const displayName = data.function?.name ? `${data.function.name}()` : '맥락 상세';
 
   if (currentStatus === 'no_history') {
     return (
@@ -45,9 +35,9 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
             <button
               type="button"
               className="btn-parent-module"
-              onClick={() => onNavigateParent?.(data.parent_module!)}
+              onClick={() => onNavigateParent?.(data.parent_module!.path)}
             >
-              상위 모듈({data.parent_module})로 이동
+              상위 모듈({data.parent_module.name})로 이동
             </button>
           )}
         </div>
@@ -57,27 +47,23 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
 
   return (
     <div className="context-tab-container">
-      {/* 1) 함수명 + 근거 뱃지 */}
       <div className="context-header">
         <span className="context-func-name">{displayName}</span>
         <span className="evidence-badge">근거 {evidences.length}건</span>
       </div>
 
-      {/* 최근 근거만 표시 안내 배너 */}
       {data.evidence_truncated && (
         <div className="context-warning-banner">
           ⚠️ 근거가 많아 최근 근거만 표시됩니다.
         </div>
       )}
 
-      {/* 상충 상태 안내 배너 */}
       {currentStatus === 'conflicting' && (
         <div className="context-conflicting-banner">
           ⚠️ 상충되는 근거가 감지되었습니다. 양쪽 근거를 모두 표시합니다.
         </div>
       )}
 
-      {/* 2) 작성 배경 섹션 */}
       {data.summary && (
         <div className="context-section">
           <h4 className="section-label">작성 배경</h4>
@@ -87,7 +73,6 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
 
       <div className="context-divider" />
 
-      {/* 3) 근거 출처 섹션 */}
       <div className="context-section">
         <div className="section-label-row">
           <h4 className="section-label">근거 출처</h4>
@@ -105,15 +90,13 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
         {!isEvidenceCollapsed && (
           <div className="evidence-card-list">
             {evidences.map((item: any, idx: number) => {
-              const isCommit = item.type === 'commit' || Boolean(item.sha);
+              const isCommit = item.kind === 'commit' || Boolean(item.sha);
               const typeLabel = isCommit ? '커밋' : 'PR';
               const idLabel = isCommit ? (item.sha?.slice(0, 7) || 'sha') : `#${item.number || idx + 1}`;
 
               const metaInfo = [
-                item.date,
-                isCommit && item.author ? `@${item.author}` : null,
-                isCommit && item.pr_number ? `PR #${item.pr_number}` : null,
-                !isCommit && item.author ? `@${item.author} 리뷰` : null,
+                item.date ? item.date.slice(0, 10) : null,
+                item.author ? `@${item.author}` : null,
               ]
                 .filter(Boolean)
                 .join(' · ');
@@ -137,7 +120,10 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
                     )}
                   </div>
 
-                  <div className="card-title">{item.message || item.title}</div>
+                  <div className="card-title">{item.title || item.message}</div>
+                  {item.review_excerpt && (
+                    <div className="card-review-excerpt">"{item.review_excerpt}"</div>
+                  )}
 
                   {metaInfo && <div className="card-meta">{metaInfo}</div>}
                 </div>
