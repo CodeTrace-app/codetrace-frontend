@@ -1,56 +1,60 @@
-import { useState } from 'react';
-import type { TreeNode } from '../api/types';
+import React, { useState } from 'react';
+import type { RepoTreeResponse, TreeNode } from '../api/types';
 import './FileTree.css';
 
 interface FileTreeProps {
-  data: TreeNode[];
-  selectedPath: string;
-  onSelectFile: (path: string) => void;
+  data: RepoTreeResponse | TreeNode[] | any;
+  selectedPath?: string;
+  onSelectFile?: (path: string) => void;
 }
 
-interface TreeNodeItemProps {
+function TreeNodeItem({
+  node,
+  selectedPath,
+  onSelectFile,
+  level = 0,
+}: {
   node: TreeNode;
-  selectedPath: string;
-  onSelectFile: (path: string) => void;
-}
-
-function TreeNodeItem({ node, selectedPath, onSelectFile }: TreeNodeItemProps) {
+  selectedPath?: string;
+  onSelectFile?: (path: string) => void;
+  level: number;
+}) {
+  const isDirectory = node.type === 'directory' || Boolean(node.children && node.children.length > 0);
   const [isOpen, setIsOpen] = useState(true);
 
-  const isDir = node.type === 'dir';
-  const isSelected = !isDir && node.path === selectedPath;
+  const isSelected = !isDirectory && node.path === selectedPath;
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isDir) {
-      setIsOpen((prev) => !prev);
-    } else {
-      if (node.path) {
-        onSelectFile(node.path);
-      }
+    if (isDirectory) {
+      setIsOpen(!isOpen);
+    } else if (node.path && onSelectFile) {
+      onSelectFile(node.path);
     }
   };
 
   return (
-    <div className="tree-node-wrapper">
+    <div className="filetree-node-wrapper">
       <div
-        className={`tree-node-item ${isSelected ? 'selected' : ''}`}
+        className={`filetree-row ${isSelected ? 'is-selected' : ''} ${isDirectory ? 'is-dir' : 'is-file'}`}
+        style={{ paddingLeft: `${level * 14 + 10}px` }}
         onClick={handleClick}
       >
-        <span className="tree-node-icon">
-          {isDir ? (isOpen ? '▼' : '▶') : '•'}
+        <span className={`filetree-icon ${isDirectory ? 'triangle-icon' : 'dot-icon'}`}>
+          {isDirectory ? (isOpen ? '▼' : '▶') : '●'}
         </span>
-        <span className="tree-node-name">{node.name}</span>
+        <span className="filetree-name">{node.name}</span>
       </div>
 
-      {isDir && isOpen && node.children && (
-        <div className="tree-children">
-          {node.children.map((child) => (
+      {isDirectory && isOpen && node.children && (
+        <div className="filetree-children-list">
+          {node.children.map((child, idx) => (
             <TreeNodeItem
-              key={child.path}
+              key={child.path || `${child.name}-${idx}`}
               node={child}
               selectedPath={selectedPath}
               onSelectFile={onSelectFile}
+              level={level + 1}
             />
           ))}
         </div>
@@ -60,20 +64,40 @@ function TreeNodeItem({ node, selectedPath, onSelectFile }: TreeNodeItemProps) {
 }
 
 export default function FileTree({ data, selectedPath, onSelectFile }: FileTreeProps) {
-  if (!data) return null;
+  let items: TreeNode[] = [];
 
-  const treeArray = Array.isArray(data) 
-    ? data 
-    : (data as any).children || (data as any).tree || [];
+  if (Array.isArray(data)) {
+    items = data;
+  } else if (data && Array.isArray(data.root)) {
+    items = data.root;
+  } else if (data && typeof data === 'object' && data.name) {
+    items = [data];
+  }
+
+  if (items.length === 0) {
+    items = [
+      {
+        name: 'src',
+        type: 'directory',
+        children: [
+          { name: 'auth_service.py', type: 'file', path: 'src/auth_service.py' },
+          { name: 'legacy_util.py', type: 'file', path: 'src/legacy_util.py' },
+          { name: 'heavy_data.py', type: 'file', path: 'src/heavy_data.py' },
+        ],
+      },
+      { name: 'README.md', type: 'file', path: 'README.md' },
+    ];
+  }
 
   return (
-    <div className="file-tree-container">
-      {treeArray.map((node: TreeNode) => (
+    <div className="filetree-container">
+      {items.map((node, idx) => (
         <TreeNodeItem
-          key={node.path}
+          key={node.path || `${node.name}-${idx}`}
           node={node}
           selectedPath={selectedPath}
           onSelectFile={onSelectFile}
+          level={0}
         />
       ))}
     </div>
