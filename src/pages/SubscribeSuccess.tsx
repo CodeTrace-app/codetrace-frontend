@@ -1,26 +1,22 @@
 import { useNavigate } from 'react-router-dom';
-import './SubscribeSuccess.css'; // 👈 네가 저장한 경로에 맞게 수정해줘!
+import './SubscribeSuccess.css';
 
 export default function SubscribeSuccess() {
   const navigate = useNavigate();
 
   return (
     <div className="success-container">
-      
-      {/* 1. 상단 메시지 */}
       <div className="success-header">
         <h1>신청이 접수되었습니다.</h1>
         <p>구독 신청이 정상적으로 접수되었습니다. 영업일 기준 1~2일 내 검토 후 안내드립니다.</p>
       </div>
 
-      {/* 2. 접수 정보 (영수증 박스) */}
       <div className="receipt-box">
         <div className="receipt-header">
           <h2>접수 정보</h2>
           <span className="receipt-status">접수 완료</span>
         </div>
         
-        {/* 디자인 시안과 똑같이 3단 그리드로 배치 */}
         <div className="receipt-grid">
           <div className="receipt-item">
             <label>접수 번호</label>
@@ -49,7 +45,6 @@ export default function SubscribeSuccess() {
         </div>
       </div>
 
-      {/* 3. 검토 절차 안내 */}
       <div className="procedure-section">
         <h2>검토 절차 안내</h2>
         <ol className="procedure-list">
@@ -59,7 +54,6 @@ export default function SubscribeSuccess() {
         </ol>
       </div>
 
-      {/* 4. 하단 문의처 및 버튼 */}
       <div className="success-footer">
         <p className="success-contact">문의가 있으시면 support@codetrace.io로 연락해 주세요.</p>
         <div className="success-actions">
@@ -67,7 +61,6 @@ export default function SubscribeSuccess() {
           <button className="btn-secondary" onClick={() => navigate('/pricing')}>요금제 확인</button>
         </div>
       </div>
-
     </div>
   );
 }

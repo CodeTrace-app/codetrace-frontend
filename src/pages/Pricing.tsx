@@ -1,19 +1,16 @@
 import { Link } from 'react-router-dom';
-import './pricing.css';
+import './Pricing.css';
 
 export default function Pricing() {
   return (
     <div className="pricing-container">
       <div className="pricing-wrapper">
-        {/* 1. 상단 타이틀 */}
         <section className="pricing-header">
           <h1>코드 트레이스 요금제</h1>
           <p>조직당 정액 구독 · 인원 무제한 · 인덱싱 레포 수 기준</p>
         </section>
 
-        {/* 2. 요금제 카드 */}
         <section className="pricing-cards">
-          {/* Starter 플랜 */}
           <div className="pricing-card">
             <p className="pricing-card__subtitle">소규모 팀을 위한 시작 플랜</p>
             <h2 className="pricing-card__title">Starter</h2>
@@ -29,7 +26,6 @@ export default function Pricing() {
             </ul>
           </div>
 
-          {/* Team 플랜 */}
           <div className="pricing-card">
             <p className="pricing-card__subtitle">성장하는 개발 조직의 표준 플랜</p>
             <h2 className="pricing-card__title">Team</h2>
@@ -46,7 +42,6 @@ export default function Pricing() {
             </ul>
           </div>
 
-          {/* Pro/Enterprise 플랜 (디자인 원본 오타 감안) */}
           <div className="pricing-card">
             <p className="pricing-card__subtitle">대규모 레거시 코드베이스 전용</p>
             <h2 className="pricing-card__title">Pro</h2>
@@ -65,7 +60,6 @@ export default function Pricing() {
           </div>
         </section>
 
-        {/* 3. 플랜 비교 표 */}
         <section className="pricing-table-section">
           <h2>플랜 비교</h2>
           <div className="pricing-table-wrapper">
@@ -80,7 +74,6 @@ export default function Pricing() {
                 </tr>
               </thead>
               <tbody>
-                {/* 임시 데이터 행 5개 생성 */}
                 {[...Array(5)].map((_, i) => (
                   <tr key={i}>
                     <td><span className="placeholder-pill"></span></td>
@@ -95,7 +88,6 @@ export default function Pricing() {
           </div>
         </section>
 
-        {/* 4. 자주 묻는 질문 */}
         <section className="pricing-faq">
           <h2>자주 묻는 질문</h2>
           
@@ -115,7 +107,6 @@ export default function Pricing() {
           </div>
         </section>
 
-        {/* 5. 하단 CTA 버튼 */}
         <section className="pricing-cta">
           <h2>지금 바로 시작하세요</h2>
           <p>레거시 코드의 맥락을 팀 전체가 공유할 수 있습니다.</p>

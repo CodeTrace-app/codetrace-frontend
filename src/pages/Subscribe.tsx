@@ -1,9 +1,8 @@
 import { useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom'; // 👈 useLocation 추가!
-import './subscribe.css';
-import './pricing.css';
+import { useNavigate, useLocation } from 'react-router-dom';
+import './Subscribe.css';
+import './Pricing.css';
 
-// 💡 플랜별 상세 정보를 미리 정리해 둔 데이터 사전!
 const PLAN_DATA: Record<string, any> = {
   Starter: {
     subtitle: '소규모 팀을 위한 시작 플랜',
@@ -24,11 +23,9 @@ const PLAN_DATA: Record<string, any> = {
 
 export default function Subscribe() {
   const navigate = useNavigate();
-  const location = useLocation(); // 👈 요금제 페이지에서 던진 보따리 받기!
-  
-  // 전달받은 플랜이 없으면 기본값으로 'Starter'를 보여줌
+  const location = useLocation();
   const selectedPlanName = location.state?.plan || 'Starter';
-  const currentPlan = PLAN_DATA[selectedPlanName]; // 선택된 플랜의 데이터 꺼내오기
+  const currentPlan = PLAN_DATA[selectedPlanName];
 
   const [billingCycle, setBillingCycle] = useState('monthly');
   const [userCount, setUserCount] = useState(5);
@@ -75,7 +72,6 @@ export default function Subscribe() {
           </div>
 
           <div className="subscribe-right">
-            {/* 💡 정적으로 박혀있던 글씨들을 currentPlan 변수로 교체! */}
             <div className="pricing-card" style={{ maxWidth: '100%', margin: 0 }}>
               <p className="pricing-card__subtitle">{currentPlan.subtitle}</p>
               <h2 className="pricing-card__title">{selectedPlanName}</h2>
