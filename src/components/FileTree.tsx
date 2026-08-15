@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import type { RepoTreeResponse, TreeNode } from '../api/types';
+import { useState } from 'react';
+import type { TreeNode } from '../api/types';
 import './FileTree.css';
 
 interface FileTreeProps {
-  data: RepoTreeResponse | TreeNode[] | any;
+  data: TreeNode[] | any;
   selectedPath?: string;
   onSelectFile?: (path: string) => void;
 }
@@ -19,7 +19,7 @@ function TreeNodeItem({
   onSelectFile?: (path: string) => void;
   level: number;
 }) {
-  const isDirectory = node.type === 'directory' || Boolean(node.children && node.children.length > 0);
+  const isDirectory = node.type === 'dir' || Boolean(node.children && node.children.length > 0);
   const [isOpen, setIsOpen] = useState(true);
 
   const isSelected = !isDirectory && node.path === selectedPath;
@@ -78,7 +78,8 @@ export default function FileTree({ data, selectedPath, onSelectFile }: FileTreeP
     items = [
       {
         name: 'src',
-        type: 'directory',
+        type: 'dir',
+        path: 'src',
         children: [
           { name: 'auth_service.py', type: 'file', path: 'src/auth_service.py' },
           { name: 'legacy_util.py', type: 'file', path: 'src/legacy_util.py' },

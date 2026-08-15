@@ -1,34 +1,43 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import type { RepoTreeResponse, FileResponse, ContextResponse } from '../api/types';
+import type { TreeNode } from '../api/types';
 import FileTree from '../components/FileTree';
-import ContextTab from '../components/ContextTab';
+import ContextTab, { type ContextData } from '../components/ContextTab';
 import './Explorer.css';
 
-const mockTreeData: RepoTreeResponse = {
-  root: [
-    {
-      name: 'src',
-      type: 'directory',
-      children: [
-        {
-          name: 'api',
-          type: 'directory',
-          children: [
-            { name: 'checkout.py', type: 'file', path: 'src/api/checkout.py' },
-          ],
-        },
-        { name: 'auth_service.py', type: 'file', path: 'src/auth_service.py' },
-        { name: 'legacy_util.py', type: 'file', path: 'src/legacy_util.py' },
-        { name: 'heavy_data.py', type: 'file', path: 'src/heavy_data.py' },
-      ],
-    },
-    { name: 'README.md', type: 'file', path: 'README.md' },
-  ],
-};
+// 1. 파일 트리 목(Mock) 데이터 (TreeNode[] 규격 준수)
+const mockTreeData: TreeNode[] = [
+  {
+    name: 'src',
+    type: 'dir',
+    path: 'src',
+    children: [
+      {
+        name: 'api',
+        type: 'dir',
+        path: 'src/api',
+        children: [
+          { name: 'checkout.py', type: 'file', path: 'src/api/checkout.py' },
+        ],
+      },
+      { name: 'auth_service.py', type: 'file', path: 'src/auth_service.py' },
+      { name: 'legacy_util.py', type: 'file', path: 'src/legacy_util.py' },
+      { name: 'heavy_data.py', type: 'file', path: 'src/heavy_data.py' },
+    ],
+  },
+  { name: 'README.md', type: 'file', path: 'README.md' },
+];
 
-const mockFiles: Record<string, FileResponse> = {
+// 2. 파일 내용 목(Mock) 인터페이스 및 데이터
+interface MockFileItem {
+  path: string;
+  language: string | null;
+  truncated: boolean;
+  content: string;
+}
+
+const mockFiles: Record<string, MockFileItem> = {
   'src/auth_service.py': {
     path: 'src/auth_service.py',
     language: 'python',
@@ -52,7 +61,6 @@ def check_permission(user_id: str, role: str):
     # [Case 2: conflicting 상충 근거 발생 케이스]
     return role == "ADMIN"
 `,
-    functions: [],
   },
   'src/api/checkout.py': {
     path: 'src/api/checkout.py',
@@ -74,7 +82,6 @@ def process_payment(order_id, amount, retry=3):
                 raise
     return None
 `,
-    functions: [],
   },
   'src/legacy_util.py': {
     path: 'src/legacy_util.py',
@@ -85,7 +92,6 @@ def process_payment(order_id, amount, retry=3):
     # [Case 4: no_history 케이스 -> 상위 모듈 이동 제공]
     return text.strip().lower()
 `,
-    functions: [],
   },
   'src/heavy_data.py': {
     path: 'src/heavy_data.py',
@@ -101,11 +107,10 @@ DATA_MATRIX = [
 def load_matrix():
     return DATA_MATRIX
 `,
-    functions: [],
   },
   'README.md': {
     path: 'README.md',
-    language: null as any,
+    language: null,
     truncated: false,
     content: `# CodeTrace Project
 
@@ -116,11 +121,11 @@ def load_matrix():
 2. **영향 범위 (Impact)**: 수정 시 영향을 받는 의존성 모듈 분석
 3. **대용량 파일 가드**: 파일 초과 시 경고 배너 표시
 `,
-    functions: [],
   },
 };
 
-const mockContextMap: Record<string, ContextResponse> = {
+// 3. 맥락 목(Mock) 데이터
+const mockContextMap: Record<string, ContextData> = {
   'src/auth_service.py::verify_token': {
     status: 'ok',
     function_name: 'verify_token',
@@ -136,7 +141,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         date: '2022-11-06',
         pr_number: 143,
         url: 'https://github.com',
-      },
+      } as any,
       {
         type: 'pr',
         number: 143,
@@ -144,7 +149,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         author: 'kim-dev',
         date: '2022-11-12',
         url: 'https://github.com',
-      },
+      } as any,
       {
         type: 'commit',
         sha: '8bc1e47321ef',
@@ -153,7 +158,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         date: '2023-03-15',
         pr_number: 201,
         url: 'https://github.com',
-      },
+      } as any,
       {
         type: 'pr',
         number: 201,
@@ -161,7 +166,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         author: 'park-sec',
         date: '2023-03-16',
         url: 'https://github.com',
-      },
+      } as any,
       {
         type: 'commit',
         sha: '109ef32a87bc',
@@ -169,7 +174,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         author: 'choi-core',
         date: '2023-08-01',
         url: 'https://github.com',
-      },
+      } as any,
     ],
   },
   'src/auth_service.py::check_permission': {
@@ -186,7 +191,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         author: 'admin-lead',
         date: '2023-05-10',
         url: 'https://github.com',
-      },
+      } as any,
       {
         type: 'commit',
         sha: 'a90b2c1998af',
@@ -194,7 +199,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         author: 'intern-dev',
         date: '2023-05-12',
         url: 'https://github.com',
-      },
+      } as any,
     ],
   },
   'src/api/checkout.py::process_payment': {
@@ -212,7 +217,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         date: '2024-11-20',
         pr_number: 41,
         url: 'https://github.com',
-      },
+      } as any,
       {
         type: 'pr',
         number: 41,
@@ -220,7 +225,7 @@ const mockContextMap: Record<string, ContextResponse> = {
         author: 'lee-pg',
         date: '2024-11-21',
         url: 'https://github.com',
-      },
+      } as any,
     ],
   },
   'src/legacy_util.py::format_old_string': {
@@ -231,19 +236,12 @@ const mockContextMap: Record<string, ContextResponse> = {
     evidence_truncated: false,
     evidences: [],
   },
-  'src/heavy_data.py::load_matrix': {
-    status: 'no_history',
-    function_name: 'load_matrix',
-    parent_module: 'src/heavy_data.py',
-    summary: '',
-    evidence_truncated: false,
-    evidences: [],
-  },
 };
 
 export default function Explorer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'context' | 'impact'>('context');
+
   const fnParam = searchParams.get('fn') || 'src/auth_service.py::verify_token';
   const currentFilePath = fnParam.includes('::') ? fnParam.split('::')[0] : fnParam;
   const currentFuncName = fnParam.includes('::') ? fnParam.split('::')[1] : '';
@@ -253,7 +251,7 @@ export default function Explorer() {
 
   const fileData = mockFiles[currentFilePath] || mockFiles['src/auth_service.py'];
 
-  let contextData: ContextResponse;
+  let contextData: ContextData;
   if (mockContextMap[fnParam]) {
     contextData = mockContextMap[fnParam];
   } else if (currentFuncName) {
@@ -269,18 +267,9 @@ export default function Explorer() {
     contextData = {
       status: 'ok',
       function_name: currentFilePath.split('/').pop() || 'file_root',
-      summary: `${currentFilePath} 파일의 맥락입니다. 특정 함수의 상세 맥락을 보려면 코드 상의 함수를 마우스로 직접 클릭하세요.`,
+      summary: `${currentFilePath} 파일의 맥락입니다.`,
       evidence_truncated: false,
-      evidences: [
-        {
-          type: 'commit',
-          sha: 'init01a',
-          message: `chore: ${currentFilePath.split('/').pop()} 모듈 초기화`,
-          author: 'system',
-          date: '2023-01-10',
-          url: 'https://github.com',
-        },
-      ],
+      evidences: [],
     };
   }
 
@@ -323,10 +312,10 @@ export default function Explorer() {
 
   return (
     <div className="explorer-container">
-      {/* 파일 트리 */}
+      {/* 1. 좌측 파일 탐색기 */}
       <aside className="left-panel">
         <div className="panel-header">
-          <span>파일 트리</span>
+          <span>파일 탐색기</span>
         </div>
         <div className="tree-content">
           <FileTree
@@ -337,7 +326,7 @@ export default function Explorer() {
         </div>
       </aside>
 
-      {/* 코드 뷰어 */}
+      {/* 2. 중앙 코드 뷰어 */}
       <main className="center-panel">
         <div className="center-panel-header">
           <div className="file-info-group">
@@ -386,7 +375,7 @@ export default function Explorer() {
         </div>
       </main>
 
-      {/* 맥락/영향 범위 */}
+      {/* 3. 우측 맥락 패널 */}
       <aside className="right-panel">
         <div className="tab-header">
           <button

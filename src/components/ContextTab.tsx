@@ -1,9 +1,18 @@
-import React, { useState } from 'react';
-import type { ContextResponse, Evidence } from '../api/types';
+import { useState } from 'react';
+import type { Evidence } from '../api/types';
 import './ContextTab.css';
 
+export interface ContextData {
+  status: 'ok' | 'no_history' | 'conflicting';
+  function_name?: string;
+  parent_module?: string;
+  summary?: string;
+  evidence_truncated?: boolean;
+  evidences?: Evidence[];
+}
+
 interface ContextTabProps {
-  data: ContextResponse | null;
+  data: ContextData | any | null;
   functionName?: string;
   onNavigateParent?: (parentPath: string) => void;
 }
@@ -20,7 +29,7 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
   }
 
   const currentStatus = data.status || 'ok';
-  const evidences = data.evidences || [];
+  const evidences: Evidence[] = data.evidences || [];
   const displayName = functionName || (data.function_name ? `${data.function_name}()` : '맥락 상세');
 
   if (currentStatus === 'no_history') {
@@ -54,20 +63,21 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
         <span className="evidence-badge">근거 {evidences.length}건</span>
       </div>
 
-      {/* [Case: evidence_truncated] 최근 근거만 표시 안내 배너 */}
+      {/* 최근 근거만 표시 안내 배너 */}
       {data.evidence_truncated && (
         <div className="context-warning-banner">
           ⚠️ 근거가 많아 최근 근거만 표시됩니다.
         </div>
       )}
 
-      {/* [Case: conflicting] 상충 상태 안내 배너 */}
+      {/* 상충 상태 안내 배너 */}
       {currentStatus === 'conflicting' && (
         <div className="context-conflicting-banner">
           ⚠️ 상충되는 근거가 감지되었습니다. 양쪽 근거를 모두 표시합니다.
         </div>
       )}
 
+      {/* 2) 작성 배경 섹션 */}
       {data.summary && (
         <div className="context-section">
           <h4 className="section-label">작성 배경</h4>
@@ -77,6 +87,7 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
 
       <div className="context-divider" />
 
+      {/* 3) 근거 출처 섹션 */}
       <div className="context-section">
         <div className="section-label-row">
           <h4 className="section-label">근거 출처</h4>
@@ -93,8 +104,8 @@ export default function ContextTab({ data, functionName, onNavigateParent }: Con
 
         {!isEvidenceCollapsed && (
           <div className="evidence-card-list">
-            {evidences.map((item: Evidence, idx: number) => {
-              const isCommit = item.type === 'commit';
+            {evidences.map((item: any, idx: number) => {
+              const isCommit = item.type === 'commit' || Boolean(item.sha);
               const typeLabel = isCommit ? '커밋' : 'PR';
               const idLabel = isCommit ? (item.sha?.slice(0, 7) || 'sha') : `#${item.number || idx + 1}`;
 
