@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import type { ImpactGraph, ImpactNode } from '../api/types';
+import type { ImpactGraph } from '../api/types';
 import './ImpactTab.css';
+
+type ImpactNodeItem = ImpactGraph['nodes'][number];
 
 interface ImpactTabProps {
   data: ImpactGraph;
@@ -29,13 +31,13 @@ export default function ImpactTab({ data, onSelectNode }: ImpactTabProps) {
     return 'card-grad-4';
   };
 
-  const getRelationLabel = (node: ImpactNode) => {
+  const getRelationLabel = (node: ImpactNodeItem) => {
     if (node.kind === 'constant') return '전역 상수';
     if (node.kind === 'class') return 'import';
     return '함수 호출';
   };
 
-  const handleCardClick = (node: ImpactNode) => {
+  const handleCardClick = (node: ImpactNodeItem) => {
     if (onSelectNode) {
       onSelectNode(node.path, node.name);
     }
