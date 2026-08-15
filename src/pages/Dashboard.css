@@ -1,0 +1,179 @@
+.dashboard-container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 24px 80px 24px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1f2328;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin: 0 0 24px 0;
+  color: #0f172a;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 40px 0 16px 0;
+  color: #0f172a;
+}
+
+/* 1. 상단 요약 카드 그리드 */
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.summary-card-label {
+  font-size: 12px;
+  color: #656d76;
+  margin-bottom: 6px;
+}
+
+.summary-card-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  margin-bottom: 6px;
+}
+
+.summary-card-sub {
+  font-size: 12px;
+  color: #57606a;
+}
+
+/* 2. 레포 목록 */
+.repo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.repo-card {
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03);
+}
+
+.repo-card-left {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.repo-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.repo-meta {
+  font-size: 13px;
+  color: #656d76;
+}
+
+.repo-card-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.status-badge {
+  font-size: 13px;
+  color: #656d76;
+}
+
+.status-badge.failed {
+  color: #cf222e;
+  font-weight: 600;
+}
+
+.btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-open-explorer {
+  background-color: #3b66de;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.btn-open-explorer:hover {
+  background-color: #2b54ca;
+}
+
+.btn-reindex {
+  background-color: #f6f8fa;
+  color: #24292f;
+  border: 1px solid #d0d7de;
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.btn-reindex:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #1b1f2426;
+}
+
+.btn-reindex:disabled,
+.btn-open-explorer:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* 3. 최근 인덱싱 결과 */
+.recent-results-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.recent-result-card {
+  background: #ffffff;
+  border: 1px solid #d0d7de;
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
+.check-icon-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid #8c959f;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #57606a;
+  font-size: 14px;
+}
