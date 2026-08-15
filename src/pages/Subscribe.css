@@ -1,0 +1,144 @@
+.subscribe-container {
+  background-color: #ffffff;
+  width: 100%;
+  min-height: 100vh;
+  padding: 60px 20px;
+  font-family: sans-serif;
+  color: #333;
+}
+
+.subscribe-wrapper {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.subscribe-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.subscribe-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  margin-left: 10px;
+}
+
+.subscribe-top {
+  display: flex;
+  gap: 40px;
+  margin-bottom: 60px;
+  flex-wrap: wrap;
+}
+
+.subscribe-left {
+  flex: 2;
+  min-width: 300px;
+}
+
+.subscribe-right {
+  flex: 1;
+  min-width: 300px;
+  margin-top: 42px;
+}
+
+.section-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.billing-options {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.billing-card {
+  flex: 1;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 24px 20px;
+  cursor: pointer;
+  background-color: #fff;
+}
+
+.billing-card.active {
+  border-color: #2b5fed;
+  background-color: #f4f7fb;
+}
+
+.billing-card h3 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.billing-card p {
+  font-size: 13px;
+  color: #888;
+}
+
+.box-input {
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+  background-color: #f9fafb;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+  color: #888;
+  outline: none;
+}
+
+.subscribe-form-box {
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 40px;
+  background-color: #fff;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.form-group input, .form-group textarea {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 14px;
+  box-sizing: border-box;
+  outline: none;
+}
+
+.form-group input:focus, .form-group textarea:focus {
+  border-color: #2b5fed;
+}
+
+.form-group textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.submit-btn {
+  width: 100%;
+  background-color: #2b5fed;
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}

@@ -1,0 +1,138 @@
+.success-container {
+  background-color: #ffffff;
+  width: 100%;
+  min-height: 100vh;
+  padding: 80px 20px;
+  font-family: sans-serif;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.success-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.success-header h1 {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 16px;
+}
+
+.success-header p {
+  font-size: 16px;
+  color: #666;
+}
+
+.receipt-box {
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 40px;
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 60px;
+}
+
+.receipt-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.receipt-header h2 {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.receipt-status {
+  font-size: 14px;
+  color: #888;
+}
+
+.receipt-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 30px;
+}
+
+.receipt-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt-item label {
+  font-size: 13px;
+  color: #888;
+}
+
+.receipt-item span {
+  font-size: 15px;
+  color: #333;
+}
+
+.procedure-section {
+  text-align: center;
+  margin-bottom: 60px;
+  width: 100%;
+  max-width: 600px;
+}
+
+.procedure-section h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.procedure-list {
+  text-align: left;
+  color: #666;
+  font-size: 14px;
+  line-height: 1.8;
+  padding-left: 20px;
+}
+
+.procedure-list li {
+  margin-bottom: 16px;
+}
+
+.success-footer {
+  text-align: center;
+}
+
+.success-contact {
+  font-size: 14px;
+  color: #888;
+  margin-bottom: 30px;
+}
+
+.success-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.btn-primary {
+  background-color: #2b5fed;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background-color: #f9fafb;
+  color: #333;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
