@@ -1,110 +1,121 @@
-/* 로그인·회원가입·조직 생성이 함께 쓰는 폼 스타일.
- * 헤더 아래 남은 영역 가운데에 폼 하나를 둔다 (시안).
- */
+/* src/styles/form.css */
 
+/* 전체 배경 및 중앙 정렬 (.auth-wrapper + .auth-container 역할) */
 .auth {
-  display: grid;
-  place-items: center;
-  /* 100vh를 쓰면 헤더 높이만큼 넘친다. 레이아웃이 준 높이를 그대로 쓴다 */
-  min-height: 100%;
-  padding: var(--space-7) var(--space-5);
-  background: var(--color-surface);
+  background-color: var(--color-surface); 
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  box-sizing: border-box;
+  font-family: sans-serif;
+  color: #333;
 }
 
+/* 폼 컨테이너 (.auth-form 역할) */
 .auth__card {
   width: 100%;
-  max-width: 340px;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
 }
 
+/* 제목 및 부제목 */
 .auth__title {
-  margin-bottom: var(--space-1);
-  font-size: var(--text-lg);
-  line-height: var(--leading-tight);
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 15px;
   text-align: center;
 }
 
 .auth__subtitle {
-  margin-bottom: var(--space-6);
-  color: var(--color-text-muted);
-  font-size: var(--text-sm);
+  font-size: 16px;
+  color: #888;
+  margin-bottom: 50px;
   text-align: center;
 }
 
+/* 입력 필드 그룹 (.input-group 역할) */
 .auth__field {
-  display: block;
-  margin-bottom: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 24px;
 }
 
 .auth__label {
-  display: block;
-  margin-bottom: var(--space-2);
-  font-size: var(--text-sm);
-  font-weight: var(--weight-medium);
-  color: var(--color-text-muted);
+  font-size: 14px;
+  margin-bottom: 8px;
+  font-weight: 500;
 }
 
 .auth__input {
+  padding: 14px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
   width: 100%;
-  padding: var(--space-3);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-sm);
+  box-sizing: border-box;
   background: var(--color-surface);
-  color: var(--color-text);
-  font: inherit;
 }
 
 .auth__input:focus {
-  outline: 2px solid var(--color-primary);
-  outline-offset: -1px;
-  border-color: var(--color-primary);
+  border-color: #2b5fed;
 }
 
-/* 제출 버튼은 button.css의 .button .button--primary .button--block을 쓴다 */
-
-/* 에러는 화면을 갈아치우지 않고 폼 위에 문구로 띄운다 (에러 화면 노출 금지) */
+/* 에러 메시지 */
 .auth__error {
-  margin-bottom: var(--space-4);
-  padding: var(--space-3);
-  border-radius: var(--radius-sm);
-  background: var(--color-danger-subtle);
-  color: var(--color-danger);
-  font-size: var(--text-sm);
-}
-
-.auth__footer {
-  margin-top: var(--space-5);
+  color: #e53e3e;
+  margin-bottom: 15px;
+  font-size: 14px;
   text-align: center;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
 }
 
-/* 소셜 로그인은 범위 밖이다. 시안의 자리는 남기되 누를 수 없게 둔다
- * (연동 설정의 GitLab·Jira·Slack "준비 중" 카드와 같은 처리). */
+/* 제출 버튼 (공통 버튼 건드리지 않고, 폼 전용 버튼으로 네 디자인 적용) */
+.auth__submit-btn {
+  background-color: #2b5fed;
+  color: white;
+  padding: 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* 소셜 로그인 */
 .auth__social {
+  margin-top: 30px;
+  text-align: center;
+}
+
+.auth__social-icons {
   display: flex;
   justify-content: center;
-  gap: var(--space-4);
-  margin-top: var(--space-6);
+  gap: 20px;
+  margin-top: 15px;
+  font-size: 24px;
+  cursor: pointer;
 }
 
-.auth__social-button {
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-pill);
-  background: var(--color-surface);
-  color: var(--color-text-subtle);
-  font: inherit;
-  font-size: var(--text-sm);
-  font-weight: var(--weight-bold);
-  cursor: not-allowed;
-}
-
-.auth__social-note {
-  margin-top: var(--space-2);
+/* 하단 링크 */
+.auth__footer {
+  margin-top: 40px;
+  font-size: 14px;
+  color: #666;
   text-align: center;
-  font-size: var(--text-xs);
-  color: var(--color-text-subtle);
+}
+
+.auth__footer a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  color: #333;
+  margin-left: 5px;
 }
