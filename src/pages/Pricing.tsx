@@ -14,7 +14,7 @@ export default function Pricing() {
           <div className="pricing-card">
             <p className="pricing-card__subtitle">소규모 팀을 위한 시작 플랜</p>
             <h2 className="pricing-card__title">Starter</h2>
-            <p className="pricing-card__price">월 29,000원</p>
+            <p className="pricing-card__price">월 50,000원</p>
             <Link to="/pricing/subscribe" state={{ plan: 'Starter' }} className="pricing-card__btn">구독 신청하기</Link>
             <ul className="pricing-card__features">
               <li>조직당 / 월정액</li>
@@ -29,7 +29,7 @@ export default function Pricing() {
           <div className="pricing-card">
             <p className="pricing-card__subtitle">성장하는 개발 조직의 표준 플랜</p>
             <h2 className="pricing-card__title">Team</h2>
-            <p className="pricing-card__price">월 89,000원</p>
+            <p className="pricing-card__price">월 120,000원</p>
             <Link to="/pricing/subscribe" state={{ plan: 'Team' }} className="pricing-card__btn">구독 신청하기</Link>
             <ul className="pricing-card__features">
               <li>조직당 / 월정액</li>
@@ -44,9 +44,9 @@ export default function Pricing() {
 
           <div className="pricing-card">
             <p className="pricing-card__subtitle">대규모 레거시 코드베이스 전용</p>
-            <h2 className="pricing-card__title">Pro</h2>
-            <p className="pricing-card__price">월 249,000원</p>
-            <Link to="/pricing/subscribe" state={{ plan: 'Pro' }} className="pricing-card__btn">구독 신청하기</Link>
+            <h2 className="pricing-card__title">Business</h2>
+            <p className="pricing-card__price">도입 문의</p>
+            <Link to="/pricing/subscribe" state={{ plan: 'Business' }} className="pricing-card__btn">도입 문의하기</Link>
             <ul className="pricing-card__features">
               <li>조직당 / 월정액</li>
               <li>인덱싱 레포 무제한</li>
@@ -90,12 +90,12 @@ export default function Pricing() {
 
         <section className="pricing-faq">
           <h2>자주 묻는 질문</h2>
-          
+
           <div className="faq-item">
             <p className="faq-q">Q. 인원 추가 비용이 있나요?</p>
             <p className="faq-a">아니오. 모든 플랜은 조직당 정액이며 인원 수에 따른 추가 요금이 없습니다.</p>
           </div>
-          
+
           <div className="faq-item">
             <p className="faq-q">Q. 레포 수를 초과하면 어떻게 되나요?</p>
             <p className="faq-a">인덱싱 대상 레포 수가 플랜 한도를 초과하면 추가 레포 선택이 제한됩니다.<br/>상위 플랜으로 업그레이드하면 즉시 해제됩니다.</p>

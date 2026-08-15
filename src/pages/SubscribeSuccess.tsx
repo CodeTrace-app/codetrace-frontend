@@ -1,14 +1,26 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import './SubscribeSuccess.css';
 
 export default function SubscribeSuccess() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const {
+    inquiryId = 381,
+    message = '구독 신청이 정상적으로 접수되었습니다. 영업일 기준 1~2일 내 검토 후 안내드립니다.',
+    plan = 'Business',
+    orgName = 'Acme Corp',
+    email = 'admin@acme.com'
+  } = location.state || {};
+
+  const today = new Date();
+  const formattedDate = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
 
   return (
     <div className="success-container">
       <div className="success-header">
         <h1>신청이 접수되었습니다.</h1>
-        <p>구독 신청이 정상적으로 접수되었습니다. 영업일 기준 1~2일 내 검토 후 안내드립니다.</p>
+        <p>{message}</p>
       </div>
 
       <div className="receipt-box">
@@ -20,27 +32,27 @@ export default function SubscribeSuccess() {
         <div className="receipt-grid">
           <div className="receipt-item">
             <label>접수 번호</label>
-            <span>CT-2024-00381</span>
+            <span>CT-{today.getFullYear()}-{String(inquiryId).padStart(5, '0')}</span>
           </div>
           <div className="receipt-item">
             <label>신청 일시</label>
-            <span>2024년 6월 12일 오후 3:42</span>
+            <span>{formattedDate}</span>
           </div>
           <div className="receipt-item">
             <label>신청 플랜</label>
-            <span>Pro 플랜</span>
+            <span>{plan} 플랜</span>
           </div>
           <div className="receipt-item">
             <label>신청 조직</label>
-            <span>Acme Corp</span>
+            <span>{orgName}</span>
           </div>
           <div className="receipt-item">
             <label>담당자 이메일</label>
-            <span>admin@acme.com</span>
+            <span>{email}</span>
           </div>
           <div className="receipt-item">
-            <label>청구 추가</label>
-            <span>연간 구독</span>
+            <label>청구 주기</label>
+            <span>월간 결제</span>
           </div>
         </div>
       </div>
