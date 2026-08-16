@@ -11,7 +11,16 @@ export default function AdminSettings() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   
-  const [currentPage, setCurrentPage] = useState(1);
+  const [currentPage] = useState(1);
+
+  const mockMembers = [
+    { id: 1, name: '이제혁', email: '12341234@gmail.com', role: '관리자', auth: '전체 권한', date: '2024.05.10' },
+    { id: 2, name: '노경민', email: '12341234@gmail.com', role: '관리자', auth: '전체 권한', date: '2024.05.11' },
+    { id: 3, name: '김주형', email: '12341234@gmail.com', role: '멤버', auth: '읽기 + 탐색', date: '2024.05.12' },
+    { id: 4, name: '김연지', email: '12341234@gmail.com', role: '멤버', auth: '읽기 전용', date: '2024.05.13' },
+    { id: 5, name: '박효연', email: '12341234@gmail.com', role: '멤버', auth: '읽기 + 탐색', date: '2024.05.14' },
+    { id: 6, name: '심민서', email: '12341234@gmail.com', role: '멤버', auth: '읽기 전용', date: '2024.05.16' },
+  ];
 
   useEffect(() => {
     const loadAdminData = async () => {
@@ -68,94 +77,174 @@ export default function AdminSettings() {
     );
   }
 
-  const totalPages = logsData ? Math.ceil(logsData.total / logsData.per_page) : 1;
-
   return (
-    <div className="admin-settings-page">
-      <div className="page-header">
-        <h1 className="page-title">관리자 설정</h1>
-        <button className="btn-primary" onClick={() => navigate('/integrations')}>연동 설정으로 이동</button>
-      </div>
-
-      <div className="summary-cards">
-        <div className="summary-card">
-          <span className="card-label">현재 요금제</span>
-          <h2 className="card-value">{formatPlanName(planData?.plan)} 플랜</h2>
-          <p className="card-desc">인덱싱 레포 최대 {planData?.repo_limit}개 · 조직당 정액</p>
-          <button className="btn-outline" onClick={() => navigate('/pricing')}>요금제 변경</button>
+    <div className="admin-page-wrapper">
+      <div className="admin-settings-page">
+        <div className="page-header">
+          <h1 className="page-title">관리자 설정</h1>
+          <button className="btn-primary" onClick={() => navigate('/integrations')}>연동 설정으로 이동</button>
         </div>
-        
-        <div className="summary-card">
-          <span className="card-label">레포 사용량 (현재 연동 상태)</span>
-          <h2 className="card-value">{planData?.repos_used} / {planData?.repo_limit} 개 연결됨</h2>
-          <p className="card-desc">설치된 레포 {planData?.repos_used}개 · 잔여 한도 {planData?.repo_limit - planData?.repos_used}개</p>
-          <button className="btn-text" onClick={() => navigate('/integrations')}>연동 설정 관리 &gt;</button>
-        </div>
-      </div>
 
-      <div className="query-logs-section">
-        <h2 className="section-title">질의 이력</h2>
-        
-        <div className="table-controls">
-          <div className="search-inputs">
+        <div className="summary-cards-grid">
+          <div className="summary-card">
+            <span className="card-label">현재 요금제</span>
+            <h2 className="card-value">{formatPlanName(planData?.plan) || 'Pro'} 플랜</h2>
+            <p className="card-desc">인덱싱 레포 최대 {planData?.repo_limit || 10}개 · 조직당 정액</p>
+            <button className="btn-outline-wide" onClick={() => navigate('/pricing')}>요금제 변경</button>
+          </div>
+          
+          <div className="summary-card">
+            <span className="card-label">현재 연동 상태</span>
+            <h2 className="card-value">연결됨</h2>
+            <p className="card-desc">설치된 레포 {planData?.repos_used || 3}개 · 마지막 동기화 5분 전</p>
+            <button className="btn-text-link" onClick={() => navigate('/integrations')}>연동 설정 관리</button>
+          </div>
+
+          <div className="summary-card">
+            <span className="card-label">조직 멤버</span>
+            <h2 className="card-value">12명</h2>
+            <p className="card-desc">관리자 2명 포함</p>
+          </div>
+        </div>
+
+        <div className="admin-section">
+          <div className="section-header">
+            <h2 className="section-title">조직원 관리</h2>
+            <div className="header-actions">
+              <button className="btn-outline">✉️ 초대 링크 복사</button>
+              <button className="btn-primary">+ 조직원 초대</button>
+            </div>
+          </div>
+
+          <div className="member-stats-container">
+            <div className="stat-item">
+              <div className="stat-icon blue">👥</div>
+              <div className="stat-text">
+                <span className="label">전체 멤버</span>
+                <strong className="value">12명</strong>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-icon gray">⚙️</div>
+              <div className="stat-text">
+                <span className="label">관리자</span>
+                <strong className="value">2명</strong>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-icon light">👤</div>
+              <div className="stat-text">
+                <span className="label">일반 멤버</span>
+                <strong className="value">9명</strong>
+              </div>
+            </div>
+            <div className="stat-item">
+              <div className="stat-icon light">✉️</div>
+              <div className="stat-text">
+                <span className="label">초대 멤버</span>
+                <strong className="value">1명</strong>
+              </div>
+            </div>
+          </div>
+
+          <div className="table-responsive-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>이름</th>
+                  <th>이메일</th>
+                  <th>역할</th>
+                  <th>권한</th>
+                  <th>초대/가입일</th>
+                  <th>관리</th>
+                </tr>
+              </thead>
+              <tbody>
+                {mockMembers.map((member) => (
+                  <tr key={member.id}>
+                    <td className="font-medium">{member.name}</td>
+                    <td className="text-gray">{member.email}</td>
+                    <td>
+                      <span className={`role-badge ${member.role === '관리자' ? 'admin' : 'member'}`}>
+                        {member.role}
+                      </span>
+                    </td>
+                    <td className="text-gray">{member.auth}</td>
+                    <td className="text-gray">{member.date}</td>
+                    <td><button className="btn-more">···</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="pagination-container">
+            <button className="btn-page-nav">&lt;</button>
+            <button className="btn-page-num active">1</button>
+            <button className="btn-page-num">2</button>
+            <button className="btn-page-nav">&gt;</button>
+            <select className="page-size-select"><option>10개씩 보기 </option></select>
+          </div>
+        </div>
+
+        <div className="admin-section">
+          <h2 className="section-title">질의 이력</h2>
+          
+          <div className="table-controls">
             <div className="search-bar">
               <span className="icon">🔍</span>
               <input type="text" placeholder="사용자 또는 대상 코드 검색" />
             </div>
-            <select className="filter-select"><option>기간 ∨</option></select>
-            <select className="filter-select"><option>사용자 ∨</option></select>
-          </div>
-        </div>
-
-        <div className="table-wrapper">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>일시</th>
-                <th>사용자</th>
-                <th>동작 (질의 유형)</th>
-                <th>대상 레포</th>
-                <th>대상 범위</th>
-              </tr>
-            </thead>
-            <tbody>
-              {logsData?.items.map((log: any) => (
-                <tr key={log.id}>
-                  <td className="text-gray">{formatDate(log.created_at)}</td>
-                  <td>{log.user_name}</td>
-                  <td><span className="action-tag">{formatAction(log.action)}</span></td>
-                  <td className="text-gray">{log.repo}</td>
-                  <td className="target-code">{log.target}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
-        {totalPages > 1 && (
-          <div className="pagination-container">
-            <button className="btn-page-nav" disabled={currentPage === 1} onClick={() => setCurrentPage(p => p - 1)}>&lt;</button>
-            <div className="page-numbers">
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(num => (
-                <button 
-                  key={num} 
-                  className={`btn-page-num ${currentPage === num ? 'active' : ''}`}
-                  onClick={() => setCurrentPage(num)}
-                >
-                  {num}
-                </button>
-              ))}
+            <div className="filter-group">
+              <select className="filter-select"><option>기간 </option></select>
+              <select className="filter-select"><option>사용자 </option></select>
             </div>
-            <button className="btn-page-nav" disabled={currentPage === totalPages} onClick={() => setCurrentPage(p => p + 1)}>&gt;</button>
-            <select className="page-size-select"><option>10개씩 보기 ∨</option></select>
           </div>
-        )}
-      </div>
 
-      <div className="page-footer">
-        <button className="btn-link" onClick={() => navigate('/dashboard')}>대시보드로 돌아가기</button>
-        <button className="btn-outline">CSV로 내보내기</button>
+          <div className="table-responsive-wrapper">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>일시</th>
+                  <th>사용자</th>
+                  <th>대상 파일</th>
+                  <th>대상 함수</th>
+                  <th>질의 유형</th>
+                </tr>
+              </thead>
+              <tbody>
+                {logsData?.items?.length > 0 ? (
+                  logsData.items.map((log: any) => (
+                    <tr key={log.id}>
+                      <td className="text-gray">{formatDate(log.created_at)}</td>
+                      <td>{log.user_name}</td>
+                      <td className="text-gray">{log.repo}</td>
+                      <td className="target-code">{log.target}</td>
+                      <td><span className="action-tag">{formatAction(log.action)}</span></td>
+                    </tr>
+                  ))
+                ) : (
+                  Array.from({ length: 8 }).map((_, i) => (
+                    <tr key={i}>
+                      <td><div className="skeleton-box"></div></td>
+                      <td><div className="skeleton-box"></div></td>
+                      <td><div className="skeleton-box"></div></td>
+                      <td><div className="skeleton-box"></div></td>
+                      <td><div className="skeleton-box"></div></td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="page-footer">
+          <button className="btn-link" onClick={() => navigate('/dashboard')}>대시보드로 돌아가기</button>
+          <button className="btn-outline">CSV로 내보내기</button>
+        </div>
       </div>
     </div>
+    
   );
 }
