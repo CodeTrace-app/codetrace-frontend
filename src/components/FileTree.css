@@ -23,17 +23,17 @@
   border-radius: 4px;
   margin: 1px 6px;
   font-size: 13px;
-  color: #1f2328;
+  color: var(--color-text);
   transition: background-color 0.12s ease;
 }
 
 .filetree-row:hover {
-  background-color: #f3f4f6;
+  background-color: var(--color-surface-subtle);
 }
 
 .filetree-row.is-selected {
-  background-color: #e6f0fc;
-  color: #0969da;
+  background-color: var(--color-primary-subtle);
+  color: var(--color-primary);
   font-weight: 600;
 }
 
@@ -47,16 +47,16 @@
 
 .triangle-icon {
   font-size: 9px;
-  color: #656d76;
+  color: var(--color-text-muted);
 }
 
 .dot-icon {
   font-size: 6px;
-  color: #8c959f;
+  color: var(--color-text-subtle);
 }
 
 .filetree-row.is-selected .dot-icon {
-  color: #0969da;
+  color: var(--color-primary);
 }
 
 .filetree-name {
