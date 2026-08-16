@@ -1,63 +1,197 @@
-import { useState, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
-import FileTree from '../components/FileTree';
+import Editor, { type OnMount } from '@monaco-editor/react';
+import FileTreeComponent from '../components/FileTree';
 import ContextTab from '../components/ContextTab';
 import ImpactTab from '../components/ImpactTab';
-import {
-  fileTree as mockTreeData,
-  sourceFile as mockSourceFile,
-  contextOk,
-  contextByPath,
-  impactGraph as mockImpactGraph,
-} from '../mocks/data';
-import type { FunctionContext, ImpactGraph, SourceFile } from '../api/types';
+import { fetchTree, fetchFile, fetchContext, fetchGraph } from '../api/endpoints';
+import { splitSymbolId } from '../utils/explorerLink';
+import type { FileTree, SourceFile, FunctionContext, ImpactGraph } from '../api/types';
 import './Explorer.css';
 
 export default function Explorer() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeTab, setActiveTab] = useState<'context' | 'impact'>('context');
 
-  const fnParam = searchParams.get('fn') || 'src/payment.py::process_payment';
-  const currentFilePath = fnParam.includes('::') ? fnParam.split('::')[0] : fnParam;
-  const currentFuncName = fnParam.includes('::') ? fnParam.split('::')[1] : 'process_payment';
+  const repoParam = searchParams.get('repo') || '1';
+  const fnParam = searchParams.get('fn') || '';
 
+  const parsed = splitSymbolId(fnParam);
+  const currentFilePath = parsed?.path || (fnParam.includes('::') ? fnParam.split('::')[0] : fnParam);
+  const currentFuncName = parsed?.name || (fnParam.includes('::') ? fnParam.split('::')[1] : '');
+
+  const repoId = Number(repoParam);
   const filePathRef = useRef(currentFilePath);
   filePathRef.current = currentFilePath;
 
-  // 1. 파일 내용 (src/mocks/data.ts 의 sourceFile 사용)
-  const fileData: SourceFile = mockSourceFile;
+  const [selectedLine, setSelectedLine] = useState<number>(1);
 
-  // 2. 맥락 데이터 (src/mocks/data.ts 의 contextByPath 및 contextOk 사용)
-  const contextData: FunctionContext = contextByPath[currentFilePath] || {
-    ...contextOk,
-    function: {
-      name: currentFuncName || 'process_payment',
-      path: currentFilePath,
-      start_line: 7,
-      end_line: 22,
-    },
-  };
+  const [treeData, setTreeData] = useState<FileTree | null>(null);
+  const [fileData, setFileData] = useState<SourceFile | null>(null);
+  const [contextData, setContextData] = useState<FunctionContext | null>(null);
+  const [impactData, setImpactData] = useState<ImpactGraph | null>(null);
 
-  // 3. 영향 범위 데이터 (src/mocks/data.ts 의 impactGraph 사용)
-  const impactData: ImpactGraph = {
-    ...mockImpactGraph,
-    root: {
-      ...mockImpactGraph.root,
-      name: currentFuncName || mockImpactGraph.root.name,
-      path: currentFilePath,
-    },
-  };
+  const [isLoadingTree, setIsLoadingTree] = useState(false);
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const [isLoadingContext, setIsLoadingContext] = useState(false);
+  const [isLoadingImpact, setIsLoadingImpact] = useState(false);
 
-  // Monaco Editor 클릭 이벤트
-  const handleEditorDidMount = (editor: any) => {
-    editor.onMouseDown((e: any) => {
-      if (!e.target || !e.target.position) return;
+  useEffect(() => {
+    let isMounted = true;
+    setIsLoadingTree(true);
+
+    fetchTree(repoId)
+      .then((data: FileTree) => {
+        if (isMounted) {
+          setTreeData(data);
+          const treeRoot = Array.isArray(data)
+            ? data
+            : Array.isArray(data?.root)
+            ? data.root
+            : (data as any)?.root?.children;
+
+          if (!currentFilePath && Array.isArray(treeRoot) && treeRoot.length > 0) {
+            const findFirstFile = (nodes: any[]): any => {
+              for (const node of nodes) {
+                if (node.type === 'file') return node;
+                if (node.children) {
+                  const found = findFirstFile(node.children);
+                  if (found) return found;
+                }
+              }
+              return null;
+            };
+
+            const firstChild = findFirstFile(treeRoot);
+            if (firstChild) {
+              setSearchParams((prev) => {
+                const next = new URLSearchParams(prev);
+                next.set('fn', firstChild.path);
+                return next;
+              });
+            }
+          }
+        }
+      })
+      .catch((err: unknown) => {
+        console.error('Failed to fetch file tree:', err);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingTree(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [repoId]);
+
+  useEffect(() => {
+    if (!currentFilePath) return;
+
+    let isMounted = true;
+    setIsLoadingFile(true);
+
+    fetchFile(repoId, currentFilePath)
+      .then((data: SourceFile) => {
+        if (isMounted) {
+          setFileData(data);
+
+          if (!currentFuncName && data.functions && data.functions.length > 0) {
+            const firstFn = data.functions[0];
+            setSelectedLine(firstFn.start_line);
+            setSearchParams((prev) => {
+              const next = new URLSearchParams(prev);
+              next.set('fn', `${currentFilePath}::${firstFn.name}`);
+              return next;
+            });
+          }
+        }
+      })
+      .catch((err: unknown) => {
+        console.error('Failed to fetch file:', err);
+        if (isMounted) {
+          setFileData({
+            path: currentFilePath,
+            language: 'python',
+            truncated: false,
+            content: `# 파일을 불러오는 중 오류가 발생했습니다: ${currentFilePath}`,
+            functions: [],
+          });
+        }
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingFile(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [repoId, currentFilePath]);
+
+  useEffect(() => {
+    if (activeTab !== 'context' || !currentFilePath) return;
+
+    let isMounted = true;
+    setIsLoadingContext(true);
+
+    fetchContext(repoId, currentFilePath, selectedLine)
+      .then((data: FunctionContext) => {
+        if (isMounted) setContextData(data);
+      })
+      .catch((err: unknown) => {
+        console.error('Failed to fetch context:', err);
+        if (isMounted) setContextData(null);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingContext(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [repoId, currentFilePath, selectedLine, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'impact' || !currentFilePath) return;
+
+    const targetFunc =
+      currentFuncName ||
+      (fileData?.functions && fileData.functions.length > 0 ? fileData.functions[0].name : '');
+
+    if (!targetFunc) {
+      setImpactData(null);
+      return;
+    }
+
+    let isMounted = true;
+    setIsLoadingImpact(true);
+
+    fetchGraph(repoId, currentFilePath, targetFunc)
+      .then((data: ImpactGraph) => {
+        if (isMounted) setImpactData(data);
+      })
+      .catch((err: unknown) => {
+        console.error('Failed to fetch impact graph:', err);
+        if (isMounted) setImpactData(null);
+      })
+      .finally(() => {
+        if (isMounted) setIsLoadingImpact(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [repoId, currentFilePath, currentFuncName, fileData, activeTab]);
+
+  const handleEditorDidMount: OnMount = (editor) => {
+    editor.onDidChangeCursorPosition((e) => {
       const model = editor.getModel();
       if (!model) return;
 
-      const lineNumber = e.target.position.lineNumber;
-      const minLine = Math.max(1, lineNumber - 15);
+      const lineNumber = e.position.lineNumber;
+      setSelectedLine(lineNumber);
+
+      const minLine = Math.max(1, lineNumber - 100);
       for (let line = lineNumber; line >= minLine; line--) {
         const lineContent = model.getLineContent(line);
         const match = lineContent.match(/def\s+([a-zA-Z0-9_]+)\s*\(/);
@@ -66,9 +200,14 @@ export default function Explorer() {
           const path = filePathRef.current;
           const targetParam = `${path}::${clickedFuncName}`;
 
-          const params = new URLSearchParams(window.location.search);
-          params.set('fn', targetParam);
-          setSearchParams(params);
+          setSearchParams((prev) => {
+            const next = new URLSearchParams(prev);
+            if (next.get('fn') !== targetParam) {
+              next.set('fn', targetParam);
+              return next;
+            }
+            return prev;
+          });
           break;
         }
       }
@@ -76,90 +215,113 @@ export default function Explorer() {
   };
 
   const handleSelectFile = (path: string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('fn', path);
-    setSearchParams(params);
+    setSelectedLine(1);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('fn', path);
+      return next;
+    });
   };
 
   const handleNavigateParent = (parentPath: string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('fn', parentPath);
-    setSearchParams(params);
+    setSelectedLine(1);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('fn', parentPath);
+      return next;
+    });
   };
 
   const handleSelectImpactNode = (filePath: string, funcName?: string) => {
+    setSelectedLine(1);
     const target = funcName ? `${filePath}::${funcName}` : filePath;
-    const params = new URLSearchParams(searchParams);
-    params.set('fn', target);
-    setSearchParams(params);
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      next.set('fn', target);
+      return next;
+    });
   };
 
   return (
     <div className="explorer-container">
-      {/* 1. 좌측 파일 탐색기 */}
+      {/* 파일 트리 */}
       <aside className="left-panel">
         <div className="panel-header">
-          <span>파일 탐색기</span>
+          <span>파일 트리</span>
         </div>
         <div className="tree-content">
-          <FileTree
-            data={mockTreeData.root}
-            selectedPath={currentFilePath}
-            onSelectFile={handleSelectFile}
-          />
+          {isLoadingTree ? (
+            <div style={{ padding: '16px', color: '#656d76', fontSize: '13px' }}>
+              트리 불러오는 중...
+            </div>
+          ) : treeData?.root ? (
+            <FileTreeComponent
+              data={treeData.root}
+              selectedPath={currentFilePath}
+              onSelectFile={handleSelectFile}
+            />
+          ) : (
+            <div style={{ padding: '16px', color: '#656d76', fontSize: '13px' }}>
+              파일 목록이 없습니다.
+            </div>
+          )}
         </div>
       </aside>
 
-      {/* 2. 중앙 코드 뷰어 */}
+      {/* 코드 뷰어 */}
       <main className="center-panel">
         <div className="center-panel-header">
           <div className="file-info-group">
             <span className="current-file-path">
-              {currentFilePath.split('/').pop()}
+              {currentFilePath ? currentFilePath.split('/').pop() : '파일을 선택하세요'}
             </span>
             <span className="file-badge">읽기 전용</span>
             <span className="file-badge">
-              {fileData.language
+              {fileData?.language
                 ? fileData.language.charAt(0).toUpperCase() + fileData.language.slice(1)
                 : 'Python'}
             </span>
           </div>
         </div>
 
-        {fileData.truncated && (
+        {fileData?.truncated && (
           <div className="truncated-banner">
             ⚠️ 대용량 파일이므로 일부 내용만 표시됩니다. (500KB 초과)
           </div>
         )}
 
         <div className="editor-wrapper">
-          <Editor
-            key={currentFilePath}
-            height="100%"
-            language={fileData.language || 'python'}
-            value={fileData.content}
-            theme="vs-light"
-            onMount={handleEditorDidMount}
-            options={{
-              readOnly: true,
-              minimap: { enabled: false },
-              fontSize: 13,
-              lineNumbers: 'on',
-              scrollBeyondLastLine: false,
-              wordWrap: 'on',
-              automaticLayout: true,
-              scrollbar: {
-                vertical: 'hidden',
-                horizontal: 'hidden',
-                verticalScrollbarSize: 0,
-                horizontalScrollbarSize: 0,
-              },
-            }}
-          />
+          {isLoadingFile ? (
+            <div style={{ padding: '24px', color: '#656d76' }}>코드를 불러오는 중...</div>
+          ) : (
+            <Editor
+              key={currentFilePath}
+              height="100%"
+              language={fileData?.language || 'python'}
+              value={fileData?.content || ''}
+              theme="vs-light"
+              onMount={handleEditorDidMount}
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                fontSize: 13,
+                lineNumbers: 'on',
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                automaticLayout: true,
+                scrollbar: {
+                  vertical: 'hidden',
+                  horizontal: 'hidden',
+                  verticalScrollbarSize: 0,
+                  horizontalScrollbarSize: 0,
+                },
+              }}
+            />
+          )}
         </div>
       </main>
 
-      {/* 3. 우측 패널 (맥락 / 영향 범위) */}
+      {/* 맥락/영향 범위 */}
       <aside className="right-panel">
         <div className="tab-header">
           <button
@@ -179,19 +341,31 @@ export default function Explorer() {
         </div>
 
         <div className="tab-content">
-          {activeTab === 'context' && (
-            <ContextTab
-              data={contextData}
-              onNavigateParent={handleNavigateParent}
-            />
-          )}
+          {activeTab === 'context' &&
+            (isLoadingContext ? (
+              <div style={{ padding: '20px', color: '#656d76', fontSize: '13px' }}>
+                맥락 데이터 분석 중...
+              </div>
+            ) : contextData ? (
+              <ContextTab data={contextData} onNavigateParent={handleNavigateParent} />
+            ) : (
+              <div style={{ padding: '20px', color: '#656d76', fontSize: '13px' }}>
+                맥락 정보가 없습니다.
+              </div>
+            ))}
 
-          {activeTab === 'impact' && (
-            <ImpactTab
-              data={impactData}
-              onSelectNode={handleSelectImpactNode}
-            />
-          )}
+          {activeTab === 'impact' &&
+            (isLoadingImpact ? (
+              <div style={{ padding: '20px', color: '#656d76', fontSize: '13px' }}>
+                영향 범위 계산 중...
+              </div>
+            ) : impactData ? (
+              <ImpactTab data={impactData} onSelectNode={handleSelectImpactNode} />
+            ) : (
+              <div style={{ padding: '20px', color: '#656d76', fontSize: '13px' }}>
+                영향 범위 정보가 없습니다.
+              </div>
+            ))}
         </div>
       </aside>
     </div>

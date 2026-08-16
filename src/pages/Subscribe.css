@@ -1,10 +1,10 @@
 .subscribe-container {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   width: 100%;
   min-height: 100vh;
   padding: 60px 20px;
   font-family: sans-serif;
-  color: #333;
+  color: var(--color-text);
 }
 
 .subscribe-wrapper {
@@ -56,16 +56,16 @@
 
 .billing-card {
   flex: 1;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   padding: 24px 20px;
   cursor: pointer;
-  background-color: #fff;
+  background-color: var(--color-surface);
 }
 
 .billing-card.active {
-  border-color: #2b5fed;
-  background-color: #f4f7fb;
+  border-color: var(--color-primary);
+  background-color: var(--color-primary-subtle);
 }
 
 .billing-card h3 {
@@ -75,30 +75,30 @@
 
 .billing-card p {
   font-size: 13px;
-  color: #888;
+  color: var(--color-text-subtle);
 }
 
 .box-input {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   padding: 16px 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
-  background-color: #f9fafb;
+  background-color: var(--color-surface-subtle);
   width: 100%;
   box-sizing: border-box;
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-subtle);
   outline: none;
 }
 
 .subscribe-form-box {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   padding: 40px;
-  background-color: #fff;
+  background-color: var(--color-surface);
 }
 
 .form-group {
@@ -113,7 +113,7 @@
 
 .form-group input, .form-group textarea {
   width: 100%;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   padding: 14px;
   font-size: 14px;
@@ -122,7 +122,7 @@
 }
 
 .form-group input:focus, .form-group textarea:focus {
-  border-color: #2b5fed;
+  border-color: var(--color-primary);
 }
 
 .form-group textarea {
@@ -132,7 +132,7 @@
 
 .submit-btn {
   width: 100%;
-  background-color: #2b5fed;
+  background-color: var(--color-primary);
   color: white;
   padding: 16px;
   border: none;
