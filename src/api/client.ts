@@ -73,3 +73,28 @@ export function apiPost<T>(path: string, body?: unknown, options?: Options): Pro
 
 /** 화면에서 목 모드임을 알려야 할 때 쓴다 (예: 개발용 배지) */
 export const usingMock = USE_MOCK
+
+
+import type { FileTree, SourceFile, FunctionContext, ImpactGraph, RepoList } from './types'
+
+// --- 대시보드 API ---
+export function fetchRepoList(): Promise<RepoList> {
+  return apiGet<RepoList>('/repos')
+}
+
+// --- 탐색기 API ---
+export function fetchFileTree(repoId: number): Promise<FileTree> {
+  return apiGet<FileTree>(`/repos/${repoId}/tree`)
+}
+
+export function fetchFile(repoId: number, path: string): Promise<SourceFile> {
+  return apiGet<SourceFile>(`/repos/${repoId}/file?path=${encodeURIComponent(path)}`)
+}
+
+export function fetchFunctionContext(repoId: number, path: string, line: number): Promise<FunctionContext> {
+  return apiGet<FunctionContext>(`/repos/${repoId}/context?path=${encodeURIComponent(path)}&line=${line}`);
+}
+
+export function fetchImpactGraph(repoId: number, path: string, functionName: string): Promise<ImpactGraph> {
+  return apiGet<ImpactGraph>(`/repos/${repoId}/graph?path=${encodeURIComponent(path)}&function=${encodeURIComponent(functionName)}`);
+}
