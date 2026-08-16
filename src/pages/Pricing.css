@@ -1,5 +1,5 @@
 .pricing-container {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   width: 100%;
   min-height: 100vh;
 }
@@ -9,7 +9,7 @@
   margin: 0 auto;
   padding: 80px 20px;
   font-family: sans-serif;
-  color: #333;
+  color: var(--color-text);
 }
 
 .pricing-header {
@@ -23,7 +23,7 @@
 }
 .pricing-header p {
   font-size: 16px;
-  color: #888;
+  color: var(--color-text-subtle);
 }
 
 .pricing-cards {
@@ -38,10 +38,10 @@
   flex: 1;
   min-width: 280px;
   max-width: 310px;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 30px;
-  background: linear-gradient(135deg, #f6fbff 0%, #ffffff 100%);
+  background: linear-gradient(135deg, var(--color-primary-subtle) 0%, var(--color-surface) 100%);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
@@ -49,7 +49,7 @@
 
 .pricing-card__subtitle {
   font-size: 12px;
-  color: #888;
+  color: var(--color-text-subtle);
   margin-bottom: 8px;
 }
 
@@ -66,8 +66,8 @@
 }
 
 .pricing-card__btn {
-  background-color: #2b5fed;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   border: none;
   border-radius: 8px;
   padding: 12px;
@@ -84,7 +84,7 @@
   padding: 0;
   margin: 0;
   font-size: 14px;
-  color: #555;
+  color: var(--color-text-muted);
   line-height: 1.8;
 }
 
@@ -100,7 +100,7 @@
 
 .pricing-table-wrapper {
   overflow-x: auto;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 20px;
 }
@@ -114,25 +114,25 @@
 .pricing-table th, .pricing-table td {
   padding: 16px;
   text-align: left;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--color-border);
   font-size: 14px;
 }
 
 .pricing-table th {
   font-weight: bold;
-  color: #333;
+  color: var(--color-text);
 }
 
 .placeholder-pill {
   display: inline-block;
   width: 80%;
   height: 20px;
-  background-color: #f0f0f0;
+  background-color: var(--color-surface-subtle);
   border-radius: 10px;
 }
 
 .pricing-faq {
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 50px 20px;
   text-align: center;
@@ -154,13 +154,13 @@
 
 .faq-q {
   font-size: 15px;
-  color: #888;
+  color: var(--color-text-subtle);
   margin-bottom: 8px;
 }
 
 .faq-a {
   font-size: 14px;
-  color: #aaa;
+  color: var(--color-text-subtle);
 }
 
 .pricing-cta {
@@ -175,7 +175,7 @@
 
 .pricing-cta p {
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-subtle);
   margin-bottom: 24px;
 }
 

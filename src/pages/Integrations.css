@@ -3,7 +3,7 @@
   max-width: 1000px;
   margin: 0 auto;
   font-family: sans-serif;
-  color: #333;
+  color: var(--color-text);
 }
 
 .page-title {
@@ -26,16 +26,16 @@
 }
 
 .integration-card {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   padding: 24px;
   display: flex;
   flex-direction: column;
-  background-color: #fff;
+  background-color: var(--color-surface);
 }
 
 .integration-card.active {
-  border: 2px solid #2b5fed;
+  border: 2px solid var(--color-primary);
 }
 
 .card-header {
@@ -53,7 +53,7 @@
 
 .card-info label {
   font-size: 13px;
-  color: #666;
+  color: var(--color-text-muted);
   display: block;
   margin-bottom: 4px;
 }
@@ -61,11 +61,11 @@
 .card-info p {
   font-size: 14px;
   margin-bottom: 12px;
-  color: #333;
+  color: var(--color-text);
 }
 
 .card-info p.empty {
-  color: #a1a1aa;
+  color: var(--color-text-subtle);
   font-size: 12px;
 }
 
@@ -73,24 +73,24 @@
   margin-top: auto;
   padding: 10px;
   border-radius: 6px;
-  border: 1px solid #d1d5db;
-  background-color: #fff;
+  border: 1px solid var(--color-border-strong);
+  background-color: var(--color-surface);
   cursor: pointer;
   font-weight: 500;
-  color: #333;
+  color: var(--color-text);
 }
 
 .card-btn.primary {
-  background-color: #2b5fed;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   border: none;
 }
 
 .repo-section {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   padding: 24px;
-  background-color: #fff;
+  background-color: var(--color-surface);
 }
 
 .repo-controls {
@@ -102,7 +102,7 @@
 .search-input {
   flex: 1;
   padding: 12px 16px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 20px;
   outline: none;
   font-size: 14px;
@@ -110,9 +110,9 @@
 
 .refresh-btn {
   padding: 12px 20px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 20px;
-  background-color: #fff;
+  background-color: var(--color-surface);
   cursor: pointer;
   font-size: 14px;
   display: flex;
@@ -136,7 +136,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 0;
-  border-bottom: 1px solid #f3f4f6;
+  border-bottom: 1px solid var(--color-surface-subtle);
 }
 
 .repo-info-box {
@@ -146,7 +146,7 @@
 
 .repo-icon {
   margin-top: 2px;
-  color: #888;
+  color: var(--color-text-subtle);
 }
 
 .repo-name {
@@ -156,7 +156,7 @@
 
 .repo-meta {
   font-size: 13px;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .repo-actions {
@@ -189,13 +189,13 @@
 
 .toggle-label {
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-subtle);
 }
 
 .toggle-switch {
   width: 44px;
   height: 24px;
-  background-color: #d1d5db;
+  background-color: var(--color-border-strong);
   border-radius: 12px;
   position: relative;
   cursor: pointer;
@@ -203,7 +203,7 @@
 }
 
 .toggle-switch.on {
-  background-color: #2b5fed;
+  background-color: var(--color-primary);
 }
 
 .toggle-switch::after {
@@ -211,7 +211,7 @@
   position: absolute;
   width: 20px;
   height: 20px;
-  background-color: #fff;
+  background-color: var(--color-surface);
   border-radius: 50%;
   top: 2px;
   left: 2px;
@@ -226,8 +226,8 @@
   display: block;
   margin-left: auto;
   padding: 12px 24px;
-  background-color: #2b5fed;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   border: none;
   border-radius: 8px;
   font-weight: bold;

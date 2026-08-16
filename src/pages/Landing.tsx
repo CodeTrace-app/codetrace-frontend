@@ -15,7 +15,7 @@ export default function Landing() {
     setEntering(true);
     try {
       signIn(await startDemo());
-      navigate('/dashboard');
+      navigate('/explorer'); 
     } catch {
       setEntering(false);
     }
