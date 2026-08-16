@@ -1,20 +1,88 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import './Integrations.css';
 
-import { fetchMe, fetchIntegrations, fetchGithubInstallUrl, fetchGithubRepos, addRepo } from '../api/endpoints'; 
+import { fetchMe, fetchIntegrations, fetchGithubInstallUrl, fetchGithubRepos, fetchRepos, addRepo } from '../api/endpoints'; 
 import { ApiError } from '../api/error';
+
+interface MergedRepo {
+  name: string;
+  isPrivate: boolean;
+  status: '완료' | '파싱중' | '비활성' | '실패';
+  lastIndexText: string;
+}
 
 export default function Integrations() {
   const [isReadOnly, setIsReadOnly] = useState(false);
   const [integrations, setIntegrations] = useState<any>(null);
-  const [repos, setRepos] = useState<any[]>([]);
+  const [repos, setRepos] = useState<MergedRepo[]>([]);
+  const [selectedRepos, setSelectedRepos] = useState<Set<string>>(new Set());
+  
   const [installUrl, setInstallUrl] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const formatDateTime = (dateString?: string) => {
+    if (!dateString) return '';
+    const d = new Date(dateString);
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+  };
+
+  const loadRepoData = useCallback(async () => {
+    try {
+      const [githubData, dashboardData] = await Promise.all([
+        fetchGithubRepos(),
+        fetchRepos().catch(() => ({ repos: [] })) 
+      ]);
+
+      const activeRepoMap = new Map<string, any>();
+      (dashboardData.repos || []).forEach((r: any) => {
+        const repoName = r.name || r.github_full_name;
+        if (repoName) activeRepoMap.set(repoName, r);
+      });
+
+      const mergedList: MergedRepo[] = (githubData.repos || []).map((ghRepo: any) => {
+        const matched = activeRepoMap.get(ghRepo.github_full_name);
+        
+        let status: MergedRepo['status'] = '비활성';
+        let lastIndexText = '인덱싱 없음';
+
+        if (matched) {
+          if (matched.indexing_status === 'done') {
+            status = '완료';
+            lastIndexText = matched.last_indexed_at 
+              ? `마지막 인덱싱: ${formatDateTime(matched.last_indexed_at)}` 
+              : '마지막 인덱싱 완료';
+          } else if (matched.indexing_status === 'parsing' || matched.indexing_status === 'indexing') {
+            status = '파싱중';
+            lastIndexText = '인덱싱 중 파싱 중';
+          } else if (matched.indexing_status === 'failed') {
+            status = '실패';
+            lastIndexText = '인덱싱 실패';
+          }
+        } else if (ghRepo.already_added) {
+          status = '파싱중';
+          lastIndexText = '인덱싱 중 파싱 중';
+        }
+
+        return {
+          name: ghRepo.github_full_name,
+          isPrivate: Boolean(ghRepo.private),
+          status,
+          lastIndexText,
+        };
+      });
+
+      setRepos(mergedList);
+    } catch (err) {
+      console.error('레포 목록 갱신 실패:', err);
+    }
+  }, []);
 
   useEffect(() => {
-    const loadData = async () => {
+    const init = async () => {
+      setLoading(true);
       try {
         const me = (await fetchMe()) as { read_only?: boolean };
         setIsReadOnly(Boolean(me.read_only));
@@ -23,45 +91,72 @@ export default function Integrations() {
         setIntegrations(intData);
 
         if (intData.github.status === 'connected') {
-          const repoData = await fetchGithubRepos();
-          setRepos(repoData.repos);
+          await loadRepoData();
         } else {
           const urlData = await fetchGithubInstallUrl();
           setInstallUrl(urlData.url);
         }
       } catch (err) {
-        console.error('데이터 로드 실패', err);
+        console.error('초기 데이터 로드 실패:', err);
       } finally {
         setLoading(false);
       }
     };
-    loadData();
-  }, []);
+    init();
+  }, [loadRepoData]);
 
-  const handleToggle = async (repo: any) => {
-    if (repo.already_added || isReadOnly) return;
-
+  const handleRefresh = async () => {
+    setRefreshing(true);
     setErrorMsg(null);
-    try {
-      await addRepo(repo.github_full_name);
-      
-      setRepos(prev => prev.map(r => 
-        r.github_full_name === repo.github_full_name ? { ...r, already_added: true } : r
-      ));
-    } catch (err: any) {
-      if (err instanceof ApiError && err.status === 403) {
-        setErrorMsg('요금제 한도를 초과하여 레포를 추가할 수 없습니다.');
+    await loadRepoData();
+    setRefreshing(false);
+  };
+
+  const handleToggle = (repo: MergedRepo) => {
+    if (repo.status !== '비활성' || isReadOnly) return;
+
+    setSelectedRepos(prev => {
+      const next = new Set(prev);
+      if (next.has(repo.name)) {
+        next.delete(repo.name);
       } else {
-        setErrorMsg('인덱싱 시작에 실패했습니다.');
+        next.add(repo.name);
+      }
+      return next;
+    });
+  };
+
+  const handleBatchIndex = async () => {
+    if (selectedRepos.size === 0 || isReadOnly) return;
+    setErrorMsg(null);
+
+    setRepos(prev => prev.map(r => 
+      selectedRepos.has(r.name) ? { ...r, status: '파싱중', lastIndexText: '인덱싱 시작 중...' } : r
+    ));
+
+    let hasError = false;
+    for (const repoName of selectedRepos) {
+      try {
+        await addRepo(repoName);
+      } catch (err: any) {
+        hasError = true;
+        if (err instanceof ApiError && err.status === 403) {
+          setErrorMsg('요금제 한도를 초과하여 일부 레포를 추가할 수 없습니다.');
+        } else {
+          setErrorMsg('일부 레포 인덱싱 시작에 실패했습니다.');
+        }
       }
     }
+
+    setSelectedRepos(new Set());
+    await loadRepoData();
   };
 
   const filteredRepos = repos.filter(repo => 
-    repo.github_full_name.toLowerCase().includes(searchQuery.toLowerCase())
+    repo.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  if (loading) return <div>로딩 중...</div>;
+  if (loading) return <div style={{ padding: '40px', textAlign: 'center' }}>로딩 중...</div>;
 
   return (
     <div className="integrations-container">
@@ -80,13 +175,12 @@ export default function Integrations() {
 
       <h2 className="section-title">외부 서비스 연동</h2>
       <div className="cards-grid">
-        
-        <div className={`integration-card ${integrations?.github.status === 'connected' ? 'active' : ''}`}>
+        <div className={`integration-card ${integrations?.github?.status === 'connected' ? 'active' : ''}`}>
           <div className="card-header">
             <span>🐙</span> GitHub
           </div>
           <div className="card-info">
-            {integrations?.github.status === 'connected' ? (
+            {integrations?.github?.status === 'connected' ? (
               <>
                 <label>연동 계정</label>
                 <p>{integrations.github.account}</p>
@@ -97,7 +191,7 @@ export default function Integrations() {
               <p className="empty">GitHub 연동이 필요합니다.</p>
             )}
           </div>
-          {integrations?.github.status === 'connected' ? (
+          {integrations?.github?.status === 'connected' ? (
             <button className="card-btn primary" disabled={isReadOnly}>설정 변경</button>
           ) : (
             <button 
@@ -110,40 +204,14 @@ export default function Integrations() {
           )}
         </div>
 
-        <div className="integration-card">
-          <div className="card-header"><span style={{ color: '#fc6d26' }}>🦊</span> GitLab</div>
-          <div className="card-info">
-            <label>연동 계정</label>
-            <p>-</p>
-            <p className="empty">GitLab 연동은 추후 지원 예정입니다.</p>
-          </div>
-          <button className="card-btn" disabled>연동 예정</button>
-        </div>
-
-        <div className="integration-card">
-          <div className="card-header"><span style={{ color: '#2684FF' }}>🔷</span> Jira</div>
-          <div className="card-info">
-            <label>연동 계정</label>
-            <p>-</p>
-            <p className="empty">Jira 연동은 추후 지원 예정입니다.</p>
-          </div>
-          <button className="card-btn" disabled>연동 예정</button>
-        </div>
-
-        <div className="integration-card">
-          <div className="card-header"><span>💠</span> Slack</div>
-          <div className="card-info">
-            <label>연동 계정</label>
-            <p>-</p>
-            <p className="empty">Slack 연동은 추후 지원 예정입니다.</p>
-          </div>
-          <button className="card-btn" disabled>연동 예정</button>
-        </div>
+        <div className="integration-card"><div className="card-header"><span style={{ color: '#fc6d26' }}>🦊</span> GitLab</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">GitLab 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>연동 예정</button></div>
+        <div className="integration-card"><div className="card-header"><span style={{ color: '#2684FF' }}>🔷</span> Jira</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">Jira 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>연동 예정</button></div>
+        <div className="integration-card"><div className="card-header"><span>💠</span> Slack</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">Slack 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>연동 예정</button></div>
       </div>
 
-      {integrations?.github.status === 'connected' && (
+      {integrations?.github?.status === 'connected' && (
         <>
-          <h2 className="section-title">인덱싱 대상 레포</h2>
+          <h2 className="section-title" style={{ marginTop: '40px' }}>인덱싱 대상 레포</h2>
           <div className="repo-section">
             
             <div className="repo-controls">
@@ -154,41 +222,58 @@ export default function Integrations() {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
-              <button className="refresh-btn">
-                <span>🔄</span> 깃허브에서 레포 목록 새로고침
+              <button 
+                className="refresh-btn" 
+                onClick={handleRefresh}
+                disabled={refreshing}
+              >
+                <span>🔄</span> {refreshing ? '갱신 중...' : '깃허브에서 레포 목록 새로고침'}
               </button>
             </div>
 
             <div className="repo-list">
-              {filteredRepos.map(repo => (
-                <div className="repo-item" key={repo.github_full_name}>
-                  <div className="repo-info-box">
-                    <div className="repo-icon">{repo.private ? '🔒' : '🌐'}</div>
-                    <div>
-                      <p className="repo-name">{repo.github_full_name}</p>
-                      <p className="repo-meta">
-                        {repo.already_added ? '연동 완료' : '인덱싱 대기 중'}
-                      </p>
+              {filteredRepos.map(repo => {
+                const isToggleOn = repo.status !== '비활성' || selectedRepos.has(repo.name);
+                
+                return (
+                  <div className="repo-item" key={repo.name}>
+                    <div className="repo-info-box">
+                      <div className="repo-icon">{repo.isPrivate ? '🔒' : '📄'}</div>
+                      <div>
+                        <p className="repo-name">{repo.name}</p>
+                        <p className="repo-meta">{repo.lastIndexText}</p>
+                      </div>
                     </div>
-                  </div>
-                  
-                  <div className="repo-actions">
-                    <span className={`status-text ${repo.already_added ? 'blue' : 'gray'}`}>
-                      {repo.already_added ? '완료' : '비활성'}
-                    </span>
                     
-                    <div className="toggle-group">
-                      <span className="toggle-label">인덱싱 활성</span>
-                      <div 
-                        className={`toggle-switch ${repo.already_added ? 'on' : ''}`}
-                        onClick={() => handleToggle(repo)}
-                        style={{ cursor: repo.already_added || isReadOnly ? 'not-allowed' : 'pointer' }}
-                      ></div>
+                    <div className="repo-actions">
+                      <span className={`status-text ${repo.status === '완료' || repo.status === '파싱중' ? 'blue' : 'gray'}`}>
+                        {repo.status}
+                      </span>
+                      
+                      <div className="toggle-group">
+                        <span className="toggle-label">인덱싱 활성</span>
+                        <div 
+                          className={`toggle-switch ${isToggleOn ? 'on' : ''}`}
+                          onClick={() => handleToggle(repo)}
+                          style={{ cursor: repo.status !== '비활성' || isReadOnly ? 'not-allowed' : 'pointer' }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
+            
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '20px' }}>
+              <button 
+                className="start-indexing-btn" 
+                onClick={handleBatchIndex}
+                disabled={selectedRepos.size === 0 || isReadOnly}
+              >
+                선택한 레포 인덱싱 시작 &gt;
+              </button>
+            </div>
+
           </div>
         </>
       )}
