@@ -134,12 +134,10 @@ export default function Integrations() {
       selectedRepos.has(r.name) ? { ...r, status: '파싱중', lastIndexText: '인덱싱 시작 중...' } : r
     ));
 
-    let hasError = false;
     for (const repoName of selectedRepos) {
       try {
         await addRepo(repoName);
       } catch (err: any) {
-        hasError = true;
         if (err instanceof ApiError && err.status === 403) {
           setErrorMsg('요금제 한도를 초과하여 일부 레포를 추가할 수 없습니다.');
         } else {
