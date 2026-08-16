@@ -120,6 +120,11 @@
   gap: 8px;
 }
 
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .repo-list {
   display: flex;
   flex-direction: column;
@@ -167,8 +172,14 @@
   text-align: center;
 }
 
-.status-text.blue { color: var(--color-primary); }
-.status-text.gray { color: var(--color-text-subtle); }
+.status-text.blue {
+  color: #2b5fed;
+  font-weight: bold;
+}
+
+.status-text.gray {
+  color: #888;
+}
 
 .toggle-group {
   display: flex;
@@ -221,5 +232,15 @@
   border-radius: 8px;
   font-weight: bold;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.start-indexing-btn:disabled {
+  background-color: #a0c3ff;
+  cursor: not-allowed;
+}
+
+.start-indexing-btn:hover:not(:disabled) {
+  background-color: #1a45b8;
 }
