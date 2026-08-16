@@ -1,0 +1,217 @@
+/* 영향 범위 그래프. 그래프 라이브러리 없이 세로 카드 리스트로 그린다.
+ *
+ * 연결 유형은 색과 글자로 함께 표기한다 (색맹·흑백 대응).
+ * 색은 tokens.css의 --color-ref-* 를 쓰고 여기서 새로 정하지 않는다.
+ */
+
+.impact-tab-container {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5) var(--space-4);
+  background-color: var(--color-surface);
+  box-sizing: border-box;
+  min-height: 100%;
+}
+
+.impact-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
+.impact-title {
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  font-weight: var(--weight-bold);
+  color: var(--color-text);
+  margin: 0;
+}
+
+.impact-summary {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.impact-vertical-line {
+  width: 1px;
+  height: 20px;
+  background-color: var(--color-border-strong);
+  margin: var(--space-3) auto;
+}
+
+.impact-section-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-weight: var(--weight-medium);
+  margin: 0 0 var(--space-2) 2px;
+}
+
+.impact-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.impact-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  /* 좌측 테두리를 굵게 해 유형색이 글자와 함께 보이게 한다 */
+  border-left: 3px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.impact-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.card-func-name {
+  font-family: var(--font-mono);
+  font-size: var(--text-base);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+
+.card-ref-count {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.card-bottom-row {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+/* ── 연결 유형별 색 (tokens.css) ────────────────────────────── */
+
+.ref-call {
+  background-color: var(--color-ref-call-subtle);
+  border-left-color: var(--color-ref-call);
+}
+
+.ref-constant {
+  background-color: var(--color-ref-constant-subtle);
+  border-left-color: var(--color-ref-constant);
+}
+
+.ref-import {
+  background-color: var(--color-ref-import-subtle);
+  border-left-color: var(--color-ref-import);
+}
+
+.ref-inheritance {
+  background-color: var(--color-ref-inheritance-subtle);
+  border-left-color: var(--color-ref-inheritance);
+}
+
+/* 기준이 되는 함수. 연결 유형 어느 색과도 겹치지 않아야 눈에 띈다 */
+.target-card {
+  background-color: var(--color-selected-subtle);
+  border: 1px solid var(--color-selected);
+  border-left: 3px solid var(--color-selected);
+  cursor: default;
+}
+
+.target-card:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.card-id-badge {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--color-selected);
+  white-space: nowrap;
+}
+
+/* ── 범례 ───────────────────────────────────────────────────── */
+
+.impact-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  margin-top: var(--space-5);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.impact-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.impact-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-border-strong);
+}
+
+.impact-legend-dot.ref-call {
+  background: var(--color-ref-call);
+}
+
+.impact-legend-dot.ref-constant {
+  background: var(--color-ref-constant);
+}
+
+.impact-legend-dot.ref-import {
+  background: var(--color-ref-import);
+}
+
+.impact-legend-dot.ref-inheritance {
+  background: var(--color-ref-inheritance);
+}
+
+/* ── 접기·안내 ──────────────────────────────────────────────── */
+
+.impact-more-button {
+  width: 100%;
+  padding: var(--space-3);
+  margin-top: var(--space-3);
+  background-color: var(--color-surface);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-md);
+  color: var(--color-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  cursor: pointer;
+}
+
+.impact-more-button:hover {
+  background-color: var(--color-surface-subtle);
+  border-color: var(--color-primary);
+}
+
+.impact-truncated-banner {
+  margin-top: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-warning);
+  background-color: var(--color-warning-subtle);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-sm);
+}
