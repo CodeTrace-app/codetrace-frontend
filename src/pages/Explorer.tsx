@@ -1,249 +1,196 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import Editor, { type Monaco } from '@monaco-editor/react';
-import { fetchFile, fetchTree } from '../api/endpoints';
-import type { SourceFile, FunctionRange, TreeNode } from '../api/types';
+import Editor from '@monaco-editor/react';
 import FileTree from '../components/FileTree';
+import ContextTab from '../components/ContextTab';
+import ImpactTab from '../components/ImpactTab';
+import {
+  fileTree as mockTreeData,
+  sourceFile as mockSourceFile,
+  contextOk,
+  contextByPath,
+  impactGraph as mockImpactGraph,
+} from '../mocks/data';
+import type { FunctionContext, ImpactGraph, SourceFile } from '../api/types';
 import './Explorer.css';
 
 export default function Explorer() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [activeTab, setActiveTab] = useState<'context' | 'impact'>('context');
 
-  const repoParam = searchParams.get('repo') || '1';
-  const fnParam = searchParams.get('fn') || '';
-  const tabParam = (searchParams.get('tab') as 'context' | 'impact') || 'context';
+  const fnParam = searchParams.get('fn') || 'src/payment.py::process_payment';
+  const currentFilePath = fnParam.includes('::') ? fnParam.split('::')[0] : fnParam;
+  const currentFuncName = fnParam.includes('::') ? fnParam.split('::')[1] : 'process_payment';
 
-  const [treeData, setTreeData] = useState<TreeNode[]>([]);
-  const [fileData, setFileData] = useState<SourceFile | null>(null);
-  const [activeTab, setActiveTab] = useState<'context' | 'impact'>(tabParam);
-  const [selectedFunctionName, setSelectedFunctionName] = useState<string>('');
+  const filePathRef = useRef(currentFilePath);
+  filePathRef.current = currentFilePath;
 
-  const editorRef = useRef<any>(null);
-  const monacoRef = useRef<Monaco | null>(null);
+  // 1. 파일 내용 (src/mocks/data.ts 의 sourceFile 사용)
+  const fileData: SourceFile = mockSourceFile;
 
-  const activeTabRef = useRef(activeTab);
-  const selectedFunctionNameRef = useRef(selectedFunctionName);
-  const fileDataRef = useRef<SourceFile | null>(fileData);
+  // 2. 맥락 데이터 (src/mocks/data.ts 의 contextByPath 및 contextOk 사용)
+  const contextData: FunctionContext = contextByPath[currentFilePath] || {
+    ...contextOk,
+    function: {
+      name: currentFuncName || 'process_payment',
+      path: currentFilePath,
+      start_line: 7,
+      end_line: 22,
+    },
+  };
 
-  useEffect(() => {
-    activeTabRef.current = activeTab;
-  }, [activeTab]);
+  // 3. 영향 범위 데이터 (src/mocks/data.ts 의 impactGraph 사용)
+  const impactData: ImpactGraph = {
+    ...mockImpactGraph,
+    root: {
+      ...mockImpactGraph.root,
+      name: currentFuncName || mockImpactGraph.root.name,
+      path: currentFilePath,
+    },
+  };
 
-  useEffect(() => {
-    selectedFunctionNameRef.current = selectedFunctionName;
-  }, [selectedFunctionName]);
+  // Monaco Editor 클릭 이벤트
+  const handleEditorDidMount = (editor: any) => {
+    editor.onMouseDown((e: any) => {
+      if (!e.target || !e.target.position) return;
+      const model = editor.getModel();
+      if (!model) return;
 
-  useEffect(() => {
-    fileDataRef.current = fileData;
-  }, [fileData]);
+      const lineNumber = e.target.position.lineNumber;
+      const minLine = Math.max(1, lineNumber - 15);
+      for (let line = lineNumber; line >= minLine; line--) {
+        const lineContent = model.getLineContent(line);
+        const match = lineContent.match(/def\s+([a-zA-Z0-9_]+)\s*\(/);
+        if (match && match[1]) {
+          const clickedFuncName = match[1];
+          const path = filePathRef.current;
+          const targetParam = `${path}::${clickedFuncName}`;
 
-  useEffect(() => {
-    fetchTree(Number(repoParam))
-      .then((data: any) => {
-        const nodes = Array.isArray(data)
-          ? data
-          : data?.root || data?.children || data?.tree || [];
-
-        setTreeData(nodes);
-      })
-      .catch((err) => {
-        console.error('트리 불러오기 실패:', err);
-        setTreeData([]);
-      });
-  }, [repoParam]);
-
-  useEffect(() => {
-    const currentFn = fnParam || 'src/auth_service.py';
-    const pureFilePath = currentFn.includes('::') ? currentFn.split('::')[0] : currentFn;
-
-    fetchFile(Number(repoParam), pureFilePath)
-      .then((data) => {
-        if (data) {
-          setFileData({
-            ...data,
-            path: pureFilePath,
-            content: data.path === pureFilePath 
-              ? data.content 
-              : `// File: ${pureFilePath}\n\n${data.content}`,
-            language: (pureFilePath.endsWith('.md') ? null : (data.language || 'python')) as any,
-            truncated: data.truncated ?? false, 
-          });
+          const params = new URLSearchParams(window.location.search);
+          params.set('fn', targetParam);
+          setSearchParams(params);
+          break;
         }
-      })
-      .catch((err) => {
-        console.error('파일 불러오기 실패:', err);
-        setFileData({
-          path: pureFilePath,
-          content: `# ${pureFilePath}\n\n이 파일은 테스트용 내용입니다.`,
-          language: (pureFilePath.endsWith('.md') ? null : 'python') as any,
-          truncated: false,
-          functions: [],
-        });
-      });
-  }, [repoParam, fnParam]); 
-
-  const handleSelectFile = (filePath: string) => {
-    setSelectedFunctionName('');
-    updateUrl(filePath, activeTabRef.current);
-  };
-  
-  useEffect(() => {
-    if (fnParam.includes('::')) {
-      const [, fnName] = fnParam.split('::');
-      setSelectedFunctionName(fnName);
-    } else {
-      setSelectedFunctionName('');
-    }
-
-    if (searchParams.get('tab')) {
-      setActiveTab(searchParams.get('tab') as 'context' | 'impact');
-    }
-  }, [fnParam, searchParams]);
-
-  const updateUrl = (fnValue: string, tab: 'context' | 'impact') => {
-    setSearchParams(
-      {
-        repo: repoParam,
-        fn: fnValue,
-        tab: tab,
-      },
-      { replace: true }
-    );
-  };
-
-  const detectFunctionInRange = (startLine: number, endLine: number): FunctionRange | null => {
-    const currentData = fileDataRef.current;
-    if (!currentData || !currentData.functions) return null;
-
-    const matched = currentData.functions.filter((fn: FunctionRange) => {
-      return Math.max(startLine, fn.start_line) <= Math.min(endLine, fn.end_line);
-    });
-
-    if (matched.length === 0) return null;
-
-    return matched.reduce((prev: FunctionRange, curr: FunctionRange) => {
-      const prevRange = prev.end_line - prev.start_line;
-      const currRange = curr.end_line - curr.start_line;
-      return currRange < prevRange ? curr : prev;
+      }
     });
   };
 
-  const checkSelectionAndDetectFunction = (editor: any) => {
-    const selection = editor.getSelection();
-    if (!selection) return;
-
-    const startLine = Math.min(selection.startLineNumber, selection.endLineNumber);
-    const endLine = Math.max(selection.startLineNumber, selection.endLineNumber);
-
-    const detectedFn = detectFunctionInRange(startLine, endLine);
-    const newFnName = detectedFn ? detectedFn.name : '';
-
-    if (newFnName !== selectedFunctionNameRef.current) {
-      setSelectedFunctionName(newFnName);
-      const currentPath = fileDataRef.current?.path || fnParam.split('::')[0];
-      const fnValue = newFnName ? `${currentPath}::${newFnName}` : currentPath;
-      updateUrl(fnValue, activeTabRef.current);
-    }
+  const handleSelectFile = (path: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('fn', path);
+    setSearchParams(params);
   };
 
-  const handleEditorMount = (editor: any, monaco: Monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-
-    editor.onDidChangeCursorPosition(() => {
-      checkSelectionAndDetectFunction(editor);
-    });
-
-    editor.onDidChangeCursorSelection(() => {
-      checkSelectionAndDetectFunction(editor);
-    });
+  const handleNavigateParent = (parentPath: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('fn', parentPath);
+    setSearchParams(params);
   };
 
-  const handleTabChange = (tab: 'context' | 'impact') => {
-    setActiveTab(tab);
-    const currentPath = fileDataRef.current?.path || fnParam.split('::')[0];
-    const fnValue = selectedFunctionName ? `${currentPath}::${selectedFunctionName}` : currentPath;
-    updateUrl(fnValue, tab);
+  const handleSelectImpactNode = (filePath: string, funcName?: string) => {
+    const target = funcName ? `${filePath}::${funcName}` : filePath;
+    const params = new URLSearchParams(searchParams);
+    params.set('fn', target);
+    setSearchParams(params);
   };
-
-  const currentFilePath = fileData?.path || fnParam.split('::')[0];
 
   return (
     <div className="explorer-container">
-      {/* 파일 트리 영역 */}
+      {/* 1. 좌측 파일 탐색기 */}
       <aside className="left-panel">
-        <div className="panel-header">파일 트리</div>
-        <div className="panel-content">
+        <div className="panel-header">
+          <span>파일 탐색기</span>
+        </div>
+        <div className="tree-content">
           <FileTree
-            data={treeData}
+            data={mockTreeData.root}
             selectedPath={currentFilePath}
             onSelectFile={handleSelectFile}
           />
         </div>
       </aside>
 
-      {/* 코드 뷰어 영역 */}
+      {/* 2. 중앙 코드 뷰어 */}
       <main className="center-panel">
-        <div className="file-header">
-          <span className="file-title">
-            {fileData?.path?.split('/').pop() || '파일 선택'}
-          </span>
-          <span className="badge">읽기 전용</span>
-          <span className="badge">{fileData?.language || 'plaintext'}</span>
+        <div className="center-panel-header">
+          <div className="file-info-group">
+            <span className="current-file-path">
+              {currentFilePath.split('/').pop()}
+            </span>
+            <span className="file-badge">읽기 전용</span>
+            <span className="file-badge">
+              {fileData.language
+                ? fileData.language.charAt(0).toUpperCase() + fileData.language.slice(1)
+                : 'Python'}
+            </span>
+          </div>
         </div>
 
-        {fileData?.truncated && (
+        {fileData.truncated && (
           <div className="truncated-banner">
-            ⚠️ 대용량 파일이므로 일부 내용만 표시됩니다.
+            ⚠️ 대용량 파일이므로 일부 내용만 표시됩니다. (500KB 초과)
           </div>
         )}
 
-        <Editor
-          height="100%"
-          language={fileData?.language || 'plaintext'}
-          value={fileData?.content || ''}
-          onMount={handleEditorMount}
-          options={{
-            readOnly: true,
-            domReadOnly: true,
-            minimap: { enabled: false },
-            fontSize: 13,
-            fontFamily: 'var(--font-mono)',
-            lineNumbers: 'on',
-            scrollBeyondLastLine: false,
-            automaticLayout: true,
-          }}
-        />
+        <div className="editor-wrapper">
+          <Editor
+            key={currentFilePath}
+            height="100%"
+            language={fileData.language || 'python'}
+            value={fileData.content}
+            theme="vs-light"
+            onMount={handleEditorDidMount}
+            options={{
+              readOnly: true,
+              minimap: { enabled: false },
+              fontSize: 13,
+              lineNumbers: 'on',
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              automaticLayout: true,
+              scrollbar: {
+                vertical: 'hidden',
+                horizontal: 'hidden',
+                verticalScrollbarSize: 0,
+                horizontalScrollbarSize: 0,
+              },
+            }}
+          />
+        </div>
       </main>
 
-      {/* 맥락/영향 범위 영역 */}
+      {/* 3. 우측 패널 (맥락 / 영향 범위) */}
       <aside className="right-panel">
         <div className="tab-header">
           <button
+            type="button"
             className={`tab-button ${activeTab === 'context' ? 'active' : ''}`}
-            onClick={() => handleTabChange('context')}
+            onClick={() => setActiveTab('context')}
           >
             맥락
           </button>
           <button
+            type="button"
             className={`tab-button ${activeTab === 'impact' ? 'active' : ''}`}
-            onClick={() => handleTabChange('impact')}
+            onClick={() => setActiveTab('impact')}
           >
             영향 범위
           </button>
         </div>
 
         <div className="tab-content">
-          {activeTab === 'context' ? (
-            <div>
-              <h3>{selectedFunctionName ? '함수 단위 맥락' : '파일 단위 맥락'}</h3>
-              <p>선택된 함수: <strong>{selectedFunctionName || '없음'}</strong></p>
-            </div>
-          ) : (
-            <div>
-              <h3>영향 범위</h3>
-              <p>선택된 함수: <strong>{selectedFunctionName || '없음'}</strong></p>
-            </div>
+          {activeTab === 'context' && (
+            <ContextTab
+              data={contextData}
+              onNavigateParent={handleNavigateParent}
+            />
+          )}
+
+          {activeTab === 'impact' && (
+            <ImpactTab
+              data={impactData}
+              onSelectNode={handleSelectImpactNode}
+            />
           )}
         </div>
       </aside>

@@ -1,0 +1,161 @@
+.impact-tab-container {
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  min-height: 100%;
+}
+
+.impact-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1f2328;
+  margin: 0 0 16px 0;
+}
+
+.impact-vertical-line {
+  width: 1px;
+  height: 20px;
+  background-color: #d0d7de;
+  margin: 12px auto;
+}
+
+.impact-section-label {
+  font-size: 13px;
+  color: #656d76;
+  margin: 0 0 10px 2px;
+  font-weight: 500;
+}
+
+.impact-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.impact-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 14px 16px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+.impact-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.card-func-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1f2328;
+}
+
+.card-ref-count {
+  font-size: 13px;
+  font-weight: 600;
+  color: #0969da;
+}
+
+.card-bottom-row {
+  font-size: 12.5px;
+  color: #57606a;
+}
+
+.target-card {
+  background-color: #a8c1f8;
+  border: 1px solid #7ea8f5;
+}
+
+.target-card .card-func-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.target-github-link {
+  font-size: 12px;
+  color: #1d4ed8;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.target-github-link:hover {
+  text-decoration: underline;
+}
+
+.target-card .card-bottom-row {
+  font-size: 12.5px;
+  color: #334155;
+}
+
+.card-grad-1 {
+  background-color: #c0d5fc;
+  border: 1px solid #a8c7fa;
+}
+
+.card-grad-2 {
+  background-color: #d8e6fd;
+  border: 1px solid #c5dbfc;
+}
+
+.card-grad-3 {
+  background-color: #eaf1fe;
+  border: 1px solid #dce8fd;
+}
+
+.card-grad-4 {
+  background-color: #f2f6fe;
+  border: 1px solid #e7effd;
+}
+
+.card-step2 {
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+}
+
+.card-step2 .card-ref-count {
+  color: #0969da;
+}
+
+.impact-more-button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 14px;
+  background-color: #ffffff;
+  border: 1px dashed #8c959f;
+  border-radius: 8px;
+  color: #0969da;
+  font-size: 13.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.impact-more-button:hover {
+  background-color: #f3f4f6;
+  border-color: #0969da;
+}
+
+.impact-truncated-banner {
+  margin-top: 14px;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #9a6700;
+  background-color: #fff8c5;
+  border: 1px solid rgba(212, 167, 44, 0.4);
+  border-radius: 6px;
+}

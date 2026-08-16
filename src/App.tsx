@@ -11,6 +11,8 @@ import Integrations from './pages/Integrations'
 import Landing from './pages/Landing'
 import Login from './pages/Login'
 import Pricing from './pages/Pricing'
+import Subscribe from './pages/Subscribe'
+import SubscribeSuccess from './pages/SubscribeSuccess';
 import PrWarnings from './pages/PrWarnings'
 import Signup from './pages/Signup'
 
@@ -23,6 +25,8 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Landing />} />
             <Route path="/pricing" element={<Pricing />} />
+            <Route path="/pricing/subscribe" element={<Subscribe />} />
+            <Route path="/pricing/success" element={<SubscribeSuccess />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
 
