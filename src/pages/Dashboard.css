@@ -3,21 +3,21 @@
   margin: 0 auto;
   padding: 40px 24px 80px 24px;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-  color: #1f2328;
+  color: var(--color-text);
 }
 
 .dashboard-title {
   font-size: 24px;
   font-weight: 700;
   margin: 0 0 24px 0;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 .section-title {
   font-size: 18px;
   font-weight: 700;
   margin: 40px 0 16px 0;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 /* 1. 상단 요약 카드 그리드 */
@@ -28,8 +28,8 @@
 }
 
 .summary-card {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
@@ -37,20 +37,20 @@
 
 .summary-card-label {
   font-size: 12px;
-  color: #656d76;
+  color: var(--color-text-muted);
   margin-bottom: 6px;
 }
 
 .summary-card-value {
   font-size: 22px;
   font-weight: 700;
-  color: #0f172a;
+  color: var(--color-text);
   margin-bottom: 6px;
 }
 
 .summary-card-sub {
   font-size: 12px;
-  color: #57606a;
+  color: var(--color-text-muted);
 }
 
 /* 2. 레포 목록 */
@@ -61,8 +61,8 @@
 }
 
 .repo-card {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   padding: 20px 24px;
   display: flex;
@@ -80,12 +80,12 @@
 .repo-name {
   font-size: 16px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--color-text);
 }
 
 .repo-meta {
   font-size: 13px;
-  color: #656d76;
+  color: var(--color-text-muted);
 }
 
 .repo-card-right {
@@ -96,11 +96,11 @@
 
 .status-badge {
   font-size: 13px;
-  color: #656d76;
+  color: var(--color-text-muted);
 }
 
 .status-badge.failed {
-  color: #cf222e;
+  color: var(--color-danger);
   font-weight: 600;
 }
 
@@ -110,8 +110,8 @@
 }
 
 .btn-open-explorer {
-  background-color: #3b66de;
-  color: #ffffff;
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   border: none;
   border-radius: 8px;
   padding: 9px 16px;
@@ -122,13 +122,13 @@
 }
 
 .btn-open-explorer:hover {
-  background-color: #2b54ca;
+  background-color: var(--color-primary-hover);
 }
 
 .btn-reindex {
-  background-color: #f6f8fa;
-  color: #24292f;
-  border: 1px solid #d0d7de;
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   padding: 9px 16px;
   font-size: 13.5px;
@@ -138,8 +138,8 @@
 }
 
 .btn-reindex:hover:not(:disabled) {
-  background-color: #f3f4f6;
-  border-color: #1b1f2426;
+  background-color: var(--color-surface-subtle);
+  border-color: rgb(27 31 36 / 15%);
 }
 
 .btn-reindex:disabled,
@@ -156,8 +156,8 @@
 }
 
 .recent-result-card {
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   padding: 20px 24px;
   display: flex;
@@ -170,10 +170,10 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 1.5px solid #8c959f;
+  border: 1.5px solid var(--color-text-subtle);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #57606a;
+  color: var(--color-text-muted);
   font-size: 14px;
 }
