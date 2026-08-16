@@ -4,7 +4,7 @@ import Editor, { type OnMount } from '@monaco-editor/react';
 import FileTreeComponent from '../components/FileTree';
 import ContextTab from '../components/ContextTab';
 import ImpactTab from '../components/ImpactTab';
-import { fetchFileTree, fetchFile, fetchFunctionContext, fetchImpactGraph } from '../api/client';
+import { fetchTree, fetchFile, fetchContext, fetchGraph } from '../api/endpoints';
 import { splitSymbolId } from '../utils/explorerLink';
 import type { FileTree, SourceFile, FunctionContext, ImpactGraph } from '../api/types';
 import './Explorer.css';
@@ -40,7 +40,7 @@ export default function Explorer() {
     let isMounted = true;
     setIsLoadingTree(true);
 
-    fetchFileTree(repoId)
+    fetchTree(repoId)
       .then((data: FileTree) => {
         if (isMounted) {
           setTreeData(data);
@@ -134,7 +134,7 @@ export default function Explorer() {
     let isMounted = true;
     setIsLoadingContext(true);
 
-    fetchFunctionContext(repoId, currentFilePath, selectedLine)
+    fetchContext(repoId, currentFilePath, selectedLine)
       .then((data: FunctionContext) => {
         if (isMounted) setContextData(data);
       })
@@ -166,7 +166,7 @@ export default function Explorer() {
     let isMounted = true;
     setIsLoadingImpact(true);
 
-    fetchImpactGraph(repoId, currentFilePath, targetFunc)
+    fetchGraph(repoId, currentFilePath, targetFunc)
       .then((data: ImpactGraph) => {
         if (isMounted) setImpactData(data);
       })

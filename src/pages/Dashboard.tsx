@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGet, apiPost } from '../api/client';
-import { demoSession } from '../mocks/data';
+import { fetchRepos, reindexRepo, POLL_INTERVAL_MS } from '../api/endpoints';
+import { useAuth } from '../auth/useAuth';
 import type { RepoList } from '../api/types';
 import './Dashboard.css';
 
@@ -13,14 +13,14 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 데모 세션 여부
-  const isDemo = demoSession.read_only ?? false;
+  // 데모 세션은 읽기 전용이다. 버튼을 숨기지 않고 비활성 + 안내로 처리한다.
+  const { readOnly: isDemo } = useAuth();
 
   // 레포 목록 데이터 조회 함수
   const loadRepoList = useCallback(async (isPolling = false) => {
     try {
       if (!isPolling) setError(null);
-      const res = await apiGet<RepoList>('/repos');
+      const res = await fetchRepos();
       setData(res);
     } catch (err: unknown) {
       console.error('Failed to fetch repo list:', err);
@@ -49,7 +49,7 @@ export default function Dashboard() {
     if (hasInProgress) {
       pollingRef.current = window.setInterval(() => {
         loadRepoList(true);
-      }, 5000);
+      }, POLL_INTERVAL_MS);
     } else if (pollingRef.current) {
       window.clearInterval(pollingRef.current);
       pollingRef.current = null;
@@ -66,7 +66,7 @@ export default function Dashboard() {
   const handleReindex = async (repoId: number) => {
     if (isDemo) return;
     try {
-      await apiPost(`/repos/${repoId}/reindex`);
+      await reindexRepo(repoId);
       loadRepoList(true);
     } catch (err) {
       console.error('Reindex request failed:', err);

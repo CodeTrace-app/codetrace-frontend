@@ -1,10 +1,10 @@
 .success-container {
-  background-color: #ffffff;
+  background-color: var(--color-surface);
   width: 100%;
   min-height: 100vh;
   padding: 80px 20px;
   font-family: sans-serif;
-  color: #333;
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -23,11 +23,11 @@
 
 .success-header p {
   font-size: 16px;
-  color: #666;
+  color: var(--color-text-muted);
 }
 
 .receipt-box {
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--color-border-strong);
   border-radius: 12px;
   padding: 40px;
   width: 100%;
@@ -49,7 +49,7 @@
 
 .receipt-status {
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-subtle);
 }
 
 .receipt-grid {
@@ -66,12 +66,12 @@
 
 .receipt-item label {
   font-size: 13px;
-  color: #888;
+  color: var(--color-text-subtle);
 }
 
 .receipt-item span {
   font-size: 15px;
-  color: #333;
+  color: var(--color-text);
 }
 
 .procedure-section {
@@ -89,7 +89,7 @@
 
 .procedure-list {
   text-align: left;
-  color: #666;
+  color: var(--color-text-muted);
   font-size: 14px;
   line-height: 1.8;
   padding-left: 20px;
@@ -105,7 +105,7 @@
 
 .success-contact {
   font-size: 14px;
-  color: #888;
+  color: var(--color-text-subtle);
   margin-bottom: 30px;
 }
 
@@ -116,8 +116,8 @@
 }
 
 .btn-primary {
-  background-color: #2b5fed;
-  color: #fff;
+  background-color: var(--color-primary);
+  color: var(--color-surface);
   border: none;
   border-radius: 8px;
   padding: 14px 28px;
@@ -127,9 +127,9 @@
 }
 
 .btn-secondary {
-  background-color: #f9fafb;
-  color: #333;
-  border: 1px solid #d1d5db;
+  background-color: var(--color-surface-subtle);
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
   border-radius: 8px;
   padding: 14px 28px;
   font-size: 15px;
