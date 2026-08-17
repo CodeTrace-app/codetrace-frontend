@@ -1,6 +1,17 @@
 import { Link } from 'react-router-dom';
 import './Pricing.css';
 
+/* 요금제는 인덱싱하는 레포 수로만 나뉜다. 인원 수는 어느 플랜에서도 묻지 않는다. */
+const PLAN_ROWS = [
+  { label: '월 요금', starter: '5만 원', team: '12만 원', business: '별도 문의' },
+  { label: '인덱싱 레포', starter: '3개', team: '10개', business: '무제한' },
+  { label: '사용 인원', starter: '무제한', team: '무제한', business: '무제한' },
+  { label: '작성 배경 추적', starter: '포함', team: '포함', business: '포함' },
+  { label: '영향 범위 분석', starter: '포함', team: '포함', business: '포함' },
+  { label: 'PR 사전 경고', starter: '포함', team: '포함', business: '포함' },
+  { label: '질의 이력 보관', starter: '90일', team: '90일', business: '협의' },
+];
+
 export default function Pricing() {
   return (
     <div className="pricing-container">
@@ -66,21 +77,19 @@ export default function Pricing() {
             <table className="pricing-table">
               <thead>
                 <tr>
-                  <th>일시</th>
-                  <th>사용자</th>
-                  <th>대상 파일</th>
-                  <th>대상 함수</th>
-                  <th>질의 요청</th>
+                  <th>항목</th>
+                  <th>Starter</th>
+                  <th>Team</th>
+                  <th>Business</th>
                 </tr>
               </thead>
               <tbody>
-                {[...Array(5)].map((_, i) => (
-                  <tr key={i}>
-                    <td><span className="placeholder-pill"></span></td>
-                    <td><span className="placeholder-pill"></span></td>
-                    <td><span className="placeholder-pill"></span></td>
-                    <td><span className="placeholder-pill"></span></td>
-                    <td><span className="placeholder-pill"></span></td>
+                {PLAN_ROWS.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row">{row.label}</th>
+                    <td>{row.starter}</td>
+                    <td>{row.team}</td>
+                    <td>{row.business}</td>
                   </tr>
                 ))}
               </tbody>
