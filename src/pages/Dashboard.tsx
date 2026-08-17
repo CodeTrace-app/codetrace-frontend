@@ -77,11 +77,12 @@ export default function Dashboard() {
 
   // 상태 배지 텍스트 렌더링
   const renderStatus = (repo: RepoItem) => {
+    // 진행률은 단계마다 세는 대상이 바뀐다 (커밋 → PR → 파일). 단위를 붙이지 않는다.
     switch (repo.indexing_status) {
       case 'collecting':
         return (
           <span className="status-badge">
-            수집 중 · 커밋 {repo.progress?.current ?? 0} / {repo.progress?.total ?? 0}
+            수집 중 · {repo.progress?.current ?? 0} / {repo.progress?.total ?? 0}
           </span>
         );
       case 'parsing': {
@@ -123,6 +124,11 @@ export default function Dashboard() {
   }
 
   const doneRepos = data.repos.filter((r) => r.indexing_status === 'done');
+  // 수집·파싱 중인 레포 수. 요약 카드가 '없다'와 '1개'로 어긋나지 않게 한다.
+  const indexingNow = data.repos.filter(
+    (r) => r.indexing_status === 'collecting' || r.indexing_status === 'parsing',
+  ).length;
+
 
   return (
     <div className="dashboard-container">
@@ -145,9 +151,11 @@ export default function Dashboard() {
           <div className="summary-card-label">인덱싱된 레포</div>
           <div className="summary-card-value">{data.summary.repo_count}개</div>
           <div className="summary-card-sub">
-            {data.summary.last_indexed_at
-              ? `마지막 인덱싱 ${new Date(data.summary.last_indexed_at).toLocaleDateString('ko-KR')}`
-              : '아직 인덱싱한 레포가 없습니다'}
+            {indexingNow > 0
+              ? `${indexingNow}개 인덱싱 진행 중`
+              : data.summary.last_indexed_at
+                ? `마지막 인덱싱 ${new Date(data.summary.last_indexed_at).toLocaleDateString('ko-KR')}`
+                : '아직 인덱싱한 레포가 없습니다'}
           </div>
         </div>
         <div className="summary-card">
