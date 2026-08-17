@@ -307,3 +307,21 @@
   color: #666;
   cursor: pointer;
 }
+/* 섹션 설명과 표 빈 상태 */
+.section-desc {
+  margin: calc(var(--space-2) * -1) 0 var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+}
+
+.table-empty {
+  padding: var(--space-7) var(--space-4);
+  text-align: center;
+  color: var(--color-text-muted);
+}
+
+.table-note {
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text-subtle);
+}

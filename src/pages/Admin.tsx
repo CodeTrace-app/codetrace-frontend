@@ -1,205 +1,141 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchQueryLogs, fetchPlan } from '../api/endpoints';
+import { fetchQueryLogs, fetchPlan, fetchIntegrations } from '../api/endpoints';
 import { ApiError } from '../api/error';
+import type { Integrations, Paged, PlanInfo, QueryLog } from '../api/types';
 import './Admin.css';
+
+const PLAN_LABEL: Record<string, string> = {
+  starter: 'Starter',
+  team: 'Team',
+  business: 'Business',
+};
+
+const ACTION_LABEL: Record<string, string> = {
+  context_view: '맥락 조회',
+  graph_view: '영향 범위 조회',
+};
 
 export default function AdminSettings() {
   const navigate = useNavigate();
-  const [logsData, setLogsData] = useState<any>(null);
-  const [planData, setPlanData] = useState<any>(null);
+  const [logs, setLogs] = useState<Paged<QueryLog> | null>(null);
+  const [plan, setPlan] = useState<PlanInfo | null>(null);
+  const [github, setGithub] = useState<Integrations['github'] | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  
-  const [currentPage] = useState(1);
-
-  const mockMembers = [
-    { id: 1, name: '이제혁', email: '12341234@gmail.com', role: '관리자', auth: '전체 권한', date: '2024.05.10' },
-    { id: 2, name: '노경민', email: '12341234@gmail.com', role: '관리자', auth: '전체 권한', date: '2024.05.11' },
-    { id: 3, name: '김주형', email: '12341234@gmail.com', role: '멤버', auth: '읽기 + 탐색', date: '2024.05.12' },
-    { id: 4, name: '김연지', email: '12341234@gmail.com', role: '멤버', auth: '읽기 전용', date: '2024.05.13' },
-    { id: 5, name: '박효연', email: '12341234@gmail.com', role: '멤버', auth: '읽기 + 탐색', date: '2024.05.14' },
-    { id: 6, name: '심민서', email: '12341234@gmail.com', role: '멤버', auth: '읽기 전용', date: '2024.05.16' },
-  ];
+  const [page] = useState(1);
 
   useEffect(() => {
-    const loadAdminData = async () => {
+    let alive = true;
+    (async () => {
       setLoading(true);
       try {
-        const [planInfo, queryLogs] = await Promise.all([
+        const [planInfo, queryLogs, integrations] = await Promise.all([
           fetchPlan(),
-          fetchQueryLogs(currentPage)
+          fetchQueryLogs(page),
+          fetchIntegrations(),
         ]);
-        
-        setPlanData(planInfo);
-        setLogsData(queryLogs);
+        if (!alive) return;
+        setPlan(planInfo);
+        setLogs(queryLogs);
+        setGithub(integrations.github);
         setErrorMsg(null);
       } catch (err) {
-        if (err instanceof ApiError && err.status === 403) {
-          setErrorMsg('관리자 권한이 필요합니다. 데모 세션 및 일반 사용자는 접근할 수 없습니다.');
-        } else {
-          setErrorMsg('관리자 데이터를 불러오는 데 실패했습니다.');
-        }
+        if (!alive) return;
+        setErrorMsg(
+          err instanceof ApiError && err.status === 403
+            ? '관리자만 볼 수 있는 화면입니다. 데모 세션과 일반 사용자는 접근할 수 없습니다.'
+            : '관리자 데이터를 불러오지 못했습니다.',
+        );
       } finally {
-        setLoading(false);
+        if (alive) setLoading(false);
       }
+    })();
+    return () => {
+      alive = false;
     };
-    loadAdminData();
-  }, [currentPage]);
+  }, [page]);
 
-  const formatPlanName = (plan: string) => {
-    if (!plan) return '';
-    return plan.charAt(0).toUpperCase() + plan.slice(1).toLowerCase();
+  const formatDate = (value: string) => {
+    const d = new Date(value);
+    const p = (n: number) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
   };
 
-  const formatDate = (dateString: string) => {
-    const d = new Date(dateString);
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
-
-  const formatAction = (action: string) => {
-    switch(action) {
-      case 'context_view': return '컨텍스트 조회';
-      case 'graph_view': return '그래프 조회';
-      default: return action;
-    }
-  };
-
-  if (loading && !planData) return <div className="loading">로딩 중...</div>;
+  if (loading && plan === null) return <div className="loading">로딩 중…</div>;
 
   if (errorMsg) {
     return (
       <div className="error-container">
         <h2>접근 권한 없음</h2>
         <p>{errorMsg}</p>
-        <button className="btn-primary" onClick={() => navigate('/')}>홈으로 돌아가기</button>
+        <button className="btn-primary" onClick={() => navigate('/dashboard')}>
+          대시보드로 돌아가기
+        </button>
       </div>
     );
   }
+
+  const connected = github?.status === 'connected';
 
   return (
     <div className="admin-page-wrapper">
       <div className="admin-settings-page">
         <div className="page-header">
           <h1 className="page-title">관리자 설정</h1>
-          <button className="btn-primary" onClick={() => navigate('/integrations')}>연동 설정으로 이동</button>
+          <button className="btn-primary" onClick={() => navigate('/settings/integrations')}>
+            연동 설정으로 이동
+          </button>
         </div>
 
         <div className="summary-cards-grid">
           <div className="summary-card">
             <span className="card-label">현재 요금제</span>
-            <h2 className="card-value">{formatPlanName(planData?.plan) || 'Pro'} 플랜</h2>
-            <p className="card-desc">인덱싱 레포 최대 {planData?.repo_limit || 10}개 · 조직당 정액</p>
-            <button className="btn-outline-wide" onClick={() => navigate('/pricing')}>요금제 변경</button>
+            <h2 className="card-value">
+              {plan ? `${PLAN_LABEL[plan.plan] ?? plan.plan} 플랜` : '-'}
+            </h2>
+            <p className="card-desc">
+              {plan
+                ? `월 ${plan.price_krw.toLocaleString()}원 · 인덱싱 레포 ${plan.repo_limit}개 · 인원 무제한`
+                : '요금제 정보를 불러오지 못했습니다'}
+            </p>
+            <button className="btn-outline-wide" onClick={() => navigate('/pricing')}>
+              요금제 변경
+            </button>
           </div>
-          
+
           <div className="summary-card">
-            <span className="card-label">현재 연동 상태</span>
-            <h2 className="card-value">연결됨</h2>
-            <p className="card-desc">설치된 레포 {planData?.repos_used || 3}개 · 마지막 동기화 5분 전</p>
-            <button className="btn-text-link" onClick={() => navigate('/integrations')}>연동 설정 관리</button>
+            <span className="card-label">사용 중인 레포</span>
+            <h2 className="card-value">
+              {plan ? `${plan.repos_used} / ${plan.repo_limit}개` : '-'}
+            </h2>
+            <p className="card-desc">
+              {plan && plan.repos_used >= plan.repo_limit
+                ? '한도에 도달했습니다. 레포를 더 추가하려면 요금제를 올리세요'
+                : '인덱싱 중인 레포 수입니다'}
+            </p>
           </div>
 
           <div className="summary-card">
-            <span className="card-label">조직 멤버</span>
-            <h2 className="card-value">12명</h2>
-            <p className="card-desc">관리자 2명 포함</p>
-          </div>
-        </div>
-
-        <div className="admin-section">
-          <div className="section-header">
-            <h2 className="section-title">조직원 관리</h2>
-            <div className="header-actions">
-              <button className="btn-outline">✉️ 초대 링크 복사</button>
-              <button className="btn-primary">+ 조직원 초대</button>
-            </div>
-          </div>
-
-          <div className="member-stats-container">
-            <div className="stat-item">
-              <div className="stat-icon blue">👥</div>
-              <div className="stat-text">
-                <span className="label">전체 멤버</span>
-                <strong className="value">12명</strong>
-              </div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-icon gray">⚙️</div>
-              <div className="stat-text">
-                <span className="label">관리자</span>
-                <strong className="value">2명</strong>
-              </div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-icon light">👤</div>
-              <div className="stat-text">
-                <span className="label">일반 멤버</span>
-                <strong className="value">9명</strong>
-              </div>
-            </div>
-            <div className="stat-item">
-              <div className="stat-icon light">✉️</div>
-              <div className="stat-text">
-                <span className="label">초대 멤버</span>
-                <strong className="value">1명</strong>
-              </div>
-            </div>
-          </div>
-
-          <div className="table-responsive-wrapper">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>이름</th>
-                  <th>이메일</th>
-                  <th>역할</th>
-                  <th>권한</th>
-                  <th>초대/가입일</th>
-                  <th>관리</th>
-                </tr>
-              </thead>
-              <tbody>
-                {mockMembers.map((member) => (
-                  <tr key={member.id}>
-                    <td className="font-medium">{member.name}</td>
-                    <td className="text-gray">{member.email}</td>
-                    <td>
-                      <span className={`role-badge ${member.role === '관리자' ? 'admin' : 'member'}`}>
-                        {member.role}
-                      </span>
-                    </td>
-                    <td className="text-gray">{member.auth}</td>
-                    <td className="text-gray">{member.date}</td>
-                    <td><button className="btn-more">···</button></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="pagination-container">
-            <button className="btn-page-nav">&lt;</button>
-            <button className="btn-page-num active">1</button>
-            <button className="btn-page-num">2</button>
-            <button className="btn-page-nav">&gt;</button>
-            <select className="page-size-select"><option>10개씩 보기 </option></select>
+            <span className="card-label">GitHub 연동</span>
+            <h2 className="card-value">{connected ? '연결됨' : '연결 안 됨'}</h2>
+            <p className="card-desc">
+              {connected
+                ? `계정 ${github?.account ?? '-'}`
+                : '연동 설정에서 GitHub App을 설치하세요'}
+            </p>
+            <button className="btn-text-link" onClick={() => navigate('/settings/integrations')}>
+              연동 설정 관리
+            </button>
           </div>
         </div>
 
         <div className="admin-section">
           <h2 className="section-title">질의 이력</h2>
-          
-          <div className="table-controls">
-            <div className="search-bar">
-              <span className="icon">🔍</span>
-              <input type="text" placeholder="사용자 또는 대상 코드 검색" />
-            </div>
-            <div className="filter-group">
-              <select className="filter-select"><option>기간 </option></select>
-              <select className="filter-select"><option>사용자 </option></select>
-            </div>
-          </div>
+          <p className="section-desc">
+            조직원이 어떤 코드의 맥락과 영향 범위를 조회했는지 남습니다. 90일이 지나면 자동으로
+            삭제됩니다.
+          </p>
 
           <div className="table-responsive-wrapper">
             <table className="data-table">
@@ -207,44 +143,48 @@ export default function AdminSettings() {
                 <tr>
                   <th>일시</th>
                   <th>사용자</th>
-                  <th>대상 파일</th>
-                  <th>대상 함수</th>
+                  <th>레포</th>
+                  <th>대상</th>
                   <th>질의 유형</th>
                 </tr>
               </thead>
               <tbody>
-                {logsData?.items?.length > 0 ? (
-                  logsData.items.map((log: any) => (
+                {logs && logs.items.length > 0 ? (
+                  logs.items.map((log) => (
                     <tr key={log.id}>
                       <td className="text-gray">{formatDate(log.created_at)}</td>
                       <td>{log.user_name}</td>
                       <td className="text-gray">{log.repo}</td>
                       <td className="target-code">{log.target}</td>
-                      <td><span className="action-tag">{formatAction(log.action)}</span></td>
+                      <td>
+                        <span className="action-tag">{ACTION_LABEL[log.action] ?? log.action}</span>
+                      </td>
                     </tr>
                   ))
                 ) : (
-                  Array.from({ length: 8 }).map((_, i) => (
-                    <tr key={i}>
-                      <td><div className="skeleton-box"></div></td>
-                      <td><div className="skeleton-box"></div></td>
-                      <td><div className="skeleton-box"></div></td>
-                      <td><div className="skeleton-box"></div></td>
-                      <td><div className="skeleton-box"></div></td>
-                    </tr>
-                  ))
+                  <tr>
+                    <td colSpan={5} className="table-empty">
+                      아직 조회 기록이 없습니다. 코드 탐색기에서 함수를 열면 여기에 남습니다.
+                    </td>
+                  </tr>
                 )}
               </tbody>
             </table>
           </div>
+
+          {logs && logs.total > logs.items.length && (
+            <p className="table-note">
+              전체 {logs.total.toLocaleString()}건 중 {logs.items.length}건 표시
+            </p>
+          )}
         </div>
 
         <div className="page-footer">
-          <button className="btn-link" onClick={() => navigate('/dashboard')}>대시보드로 돌아가기</button>
-          <button className="btn-outline">CSV로 내보내기</button>
+          <button className="btn-link" onClick={() => navigate('/dashboard')}>
+            대시보드로 돌아가기
+          </button>
         </div>
       </div>
     </div>
-    
   );
 }
