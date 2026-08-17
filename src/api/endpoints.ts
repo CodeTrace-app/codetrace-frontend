@@ -27,9 +27,11 @@ import type {
 } from './types'
 
 // ── 인증·조직 ─────────────────────────────────────────────────
-
-export const signup = (email: string, password: string, name: string) =>
-  apiPost<Session>('/auth/signup', { email, password, name }, { auth: false })
+/** 인자 셋이 모두 문자열이라 순서를 바꿔도 타입 검사에 걸리지 않는다.
+ *  실제로 (name, email, password) 순으로 불러 가입이 422로 막혀 있었다.
+ *  이름을 붙여 같은 실수를 구조적으로 막는다. */
+export const signup = (form: { email: string; password: string; name: string }) =>
+  apiPost<Session>('/auth/signup', form, { auth: false })
 
 export const login = (email: string, password: string) =>
   apiPost<Session>('/auth/login', { email, password }, { auth: false })

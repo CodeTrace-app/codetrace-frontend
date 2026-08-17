@@ -31,7 +31,7 @@ export default function Signup() {
     setSubmitting(true);
 
     try {
-      const session = await signup( name, email, password );
+      const session = await signup({ email, password, name });
       signIn(session);
 
       if (session.organization === null) {
