@@ -177,3 +177,24 @@
   color: var(--color-text-muted);
   font-size: 14px;
 }
+/* 레포가 하나도 없을 때. 빈 화면 대신 다음 행동을 준다 */
+.repo-empty {
+  padding: var(--space-7) var(--space-5);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  text-align: center;
+}
+
+.repo-empty-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+}
+
+.repo-empty-sub {
+  margin: 0 0 var(--space-5);
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
