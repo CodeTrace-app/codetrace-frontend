@@ -132,13 +132,23 @@ export default function Dashboard() {
       <div className="summary-grid">
         <div className="summary-card">
           <div className="summary-card-label">연동된 Github 계정</div>
-          <div className="summary-card-value">{data.summary.github_account}</div>
-          <div className="summary-card-sub">Github App 설치 완료 · 권한 정상</div>
+          <div className="summary-card-value">
+            {data.summary.github_connected ? data.summary.github_account : '연동 안 됨'}
+          </div>
+          <div className="summary-card-sub">
+            {data.summary.github_connected
+              ? 'GitHub App 설치됨'
+              : '연동 설정에서 GitHub을 연결하세요'}
+          </div>
         </div>
         <div className="summary-card">
           <div className="summary-card-label">인덱싱된 레포</div>
           <div className="summary-card-value">{data.summary.repo_count}개</div>
-          <div className="summary-card-sub">실시간 백엔드 연동 중</div>
+          <div className="summary-card-sub">
+            {data.summary.last_indexed_at
+              ? `마지막 인덱싱 ${new Date(data.summary.last_indexed_at).toLocaleDateString('ko-KR')}`
+              : '아직 인덱싱한 레포가 없습니다'}
+          </div>
         </div>
         <div className="summary-card">
           <div className="summary-card-label">수집된 커밋</div>
@@ -152,6 +162,24 @@ export default function Dashboard() {
       {/* 2. 레포 목록 */}
       <h3 className="section-title">레포 목록</h3>
       <div className="repo-list">
+        {/* 레포가 없을 때 빈 화면을 두지 않는다. 무엇을 해야 하는지 알려준다 */}
+        {data.repos.length === 0 && (
+          <div className="repo-empty">
+            <p className="repo-empty-title">아직 인덱싱한 레포가 없습니다.</p>
+            <p className="repo-empty-sub">
+              {data.summary.github_connected
+                ? '연동 설정에서 인덱싱할 레포를 선택하세요.'
+                : '연동 설정에서 GitHub을 연결하면 레포를 선택할 수 있습니다.'}
+            </p>
+            <button
+              type="button"
+              className="btn-open-explorer"
+              onClick={() => navigate('/settings/integrations')}
+            >
+              연동 설정으로 가기
+            </button>
+          </div>
+        )}
         {data.repos.map((repo) => {
           const isDone = repo.indexing_status === 'done';
           const isFailed = repo.indexing_status === 'failed';
