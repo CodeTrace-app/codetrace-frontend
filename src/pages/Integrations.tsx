@@ -203,9 +203,9 @@ export default function Integrations() {
             )}
           </div>
 
-          <div className="integration-card"><div className="card-header"><span style={{ color: '#fc6d26' }}>🦊</span> GitLab</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">GitLab 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>연동 예정</button></div>
-          <div className="integration-card"><div className="card-header"><span style={{ color: '#2684FF' }}>🔷</span> Jira</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">Jira 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>연동 예정</button></div>
-          <div className="integration-card"><div className="card-header"><span>💠</span> Slack</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">Slack 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>연동 예정</button></div>
+          <div className="integration-card"><div className="card-header"><span style={{ color: '#fc6d26' }}>🦊</span> GitLab</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">GitLab 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>준비 중</button></div>
+          <div className="integration-card"><div className="card-header"><span style={{ color: '#2684FF' }}>🔷</span> Jira</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">Jira 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>준비 중</button></div>
+          <div className="integration-card"><div className="card-header"><span>💠</span> Slack</div><div className="card-info"><label>연동 계정</label><p>-</p><p className="empty">Slack 연동은 추후 지원 예정.</p></div><button className="card-btn" disabled>준비 중</button></div>
         </div>
 
         {integrations?.github?.status === 'connected' && (

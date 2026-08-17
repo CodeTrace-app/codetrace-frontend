@@ -6,6 +6,30 @@ import { useAuth } from '../auth/useAuth';
 import './Landing.css';
 import '../styles/button.css';
 
+/* 랜딩의 비교표. 근거 없는 수치를 쓰지 않고, 우리가 실제로 하는 것만 적는다. */
+const COMPARISON = [
+  {
+    question: '이 함수는 왜 이렇게 짜였나',
+    llm: '코드만 보고 추측한다',
+    ours: '그 함수를 바꾼 커밋과 PR 리뷰를 근거로 보여준다',
+  },
+  {
+    question: '고치면 어디가 깨지나',
+    llm: '물어본 파일 안에서만 답한다',
+    ours: '레포 전체를 파싱해 참조 위치를 2단계까지 찾는다',
+  },
+  {
+    question: '근거가 없을 때',
+    llm: '그럴듯한 설명을 만들어 낸다',
+    ours: '변경 이력 없음을 명시한다',
+  },
+  {
+    question: '언제 알려주나',
+    llm: '물어봐야 답한다',
+    ours: 'PR을 올리면 묻지 않아도 경고한다',
+  },
+];
+
 export default function Landing() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
@@ -15,7 +39,7 @@ export default function Landing() {
     setEntering(true);
     try {
       signIn(await startDemo());
-      navigate('/explorer'); 
+      navigate('/dashboard');
     } catch {
       setEntering(false);
     }
@@ -86,23 +110,20 @@ export default function Landing() {
         <h2>범용 LLM과 무엇이 다른가</h2>
         <div className="table-container">
           <div className="table-header">
-            <span>일시</span>
-            <span>사용자</span>
-            <span>대상 파일</span>
-            <span>대상 함수</span>
-            <span>질의 유형</span>
+            <span>묻는 것</span>
+            <span>범용 LLM</span>
+            <span>코드 트레이스</span>
           </div>
-          {[1, 2, 3, 4, 5, 6].map((row) => (
-            <div key={row} className="table-row">
-              <div className="table-cell"><div className="skeleton short"></div></div>
-              <div className="table-cell"><div className="skeleton long"></div></div>
-              <div className="table-cell"><div className="skeleton long"></div></div>
-              <div className="table-cell"><div className="skeleton medium"></div></div>
-              <div className="table-cell"><div className="skeleton medium"></div></div>
+          {COMPARISON.map((row) => (
+            <div key={row.question} className="table-row">
+              <div className="table-cell table-cell--label">{row.question}</div>
+              <div className="table-cell">{row.llm}</div>
+              <div className="table-cell table-cell--ours">{row.ours}</div>
             </div>
           ))}
         </div>
       </section>
+
 
       <section className="demo-section">
         <h2>3분 시연으로 직접 확인하세요</h2>
