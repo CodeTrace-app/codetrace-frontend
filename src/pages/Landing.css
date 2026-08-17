@@ -93,7 +93,7 @@
   margin-bottom: 15px;
 }
 .card p {
-  font-size: 14px;
+  font-size: var(--text-base);
   color: var(--color-text-muted);
   line-height: 1.5;
 }
@@ -113,7 +113,7 @@
   background-color: var(--color-surface-subtle, var(--color-bg));
   padding: 15px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: var(--text-base);
   border-bottom: 1px solid var(--color-border);
 }
 .table-header span {
@@ -133,14 +133,12 @@
   display: flex;
   align-items: center;
 }
-.skeleton {
-  background-color: var(--color-border);
-  height: 20px;
-  border-radius: 10px;
+/* 비교표 — 우리 열을 굵게 해 눈이 먼저 가게 한다 */
+.table-cell--label,
+.table-cell--ours {
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
 }
-.skeleton.short { width: 40%; }
-.skeleton.medium { width: 70%; }
-.skeleton.long { width: 90%; }
 
 .demo-video-card, .demo-repo-card {
   flex: 1;
@@ -163,7 +161,7 @@
   margin-bottom: 15px;
 }
 .demo-section p {
-  font-size: 14px;
+  font-size: var(--text-base);
   color: var(--color-text-muted);
   margin-bottom: 20px;
 }

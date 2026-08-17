@@ -123,13 +123,6 @@
   color: var(--color-text);
 }
 
-.placeholder-pill {
-  display: inline-block;
-  width: 80%;
-  height: 20px;
-  background-color: var(--color-surface-subtle);
-  border-radius: 10px;
-}
 
 .pricing-faq {
   border: 1px solid var(--color-border);
@@ -183,4 +176,11 @@
   display: inline-block;
   width: auto;
   padding: 14px 40px;
+}
+/* 표의 첫 열은 항목 이름이라 머리글로 둔다 */
+.pricing-table tbody th {
+  text-align: left;
+  font-weight: var(--weight-medium);
+  color: var(--color-text);
+  white-space: nowrap;
 }
