@@ -79,7 +79,7 @@ export const repoList: RepoList = {
       default_branch: 'main',
       language: 'Python',
       indexing_status: 'parsing',
-      progress: { current: 142, total: 218 },
+      progress: { current: 142, total: 218, label: '파일 파싱' },
       last_indexed_at: null,
       stats: { files: 87, functions: 342, commits: 418, prs: 96 },
     },

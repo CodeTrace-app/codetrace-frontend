@@ -77,19 +77,21 @@ export default function Dashboard() {
 
   // 상태 배지 텍스트 렌더링
   const renderStatus = (repo: RepoItem) => {
+    const p = repo.progress;
+    // 한 상태 안에 단계가 여럿이라(수집 = 커밋 → PR, 파싱 = 파일 → 근거 → 요약)
+    // 단계가 바뀌면 진행률이 0으로 돌아간다. 이름을 함께 보여줘야 되돌아간 것으로 보이지 않는다.
+    const stage = p?.label ?? (repo.indexing_status === 'collecting' ? '수집 중' : '파싱');
+
     switch (repo.indexing_status) {
       case 'collecting':
+      case 'parsing': {
+        if (!p || p.total <= 0) return <span className="status-badge">{stage}</span>;
+        const percent = Math.round((p.current / p.total) * 100);
         return (
           <span className="status-badge">
-            수집 중 · 커밋 {repo.progress?.current ?? 0} / {repo.progress?.total ?? 0}
+            {stage} · {percent}%
           </span>
         );
-      case 'parsing': {
-        const percent =
-          repo.progress && repo.progress.total > 0
-            ? Math.round((repo.progress.current / repo.progress.total) * 100)
-            : 0;
-        return <span className="status-badge">파싱 · {percent}%</span>;
       }
       case 'done':
         return <span className="status-badge">완료</span>;
@@ -123,6 +125,11 @@ export default function Dashboard() {
   }
 
   const doneRepos = data.repos.filter((r) => r.indexing_status === 'done');
+  // 수집·파싱 중인 레포 수. 요약 카드가 '없다'와 '1개'로 어긋나지 않게 한다.
+  const indexingNow = data.repos.filter(
+    (r) => r.indexing_status === 'collecting' || r.indexing_status === 'parsing',
+  ).length;
+
 
   return (
     <div className="dashboard-container">
@@ -145,9 +152,11 @@ export default function Dashboard() {
           <div className="summary-card-label">인덱싱된 레포</div>
           <div className="summary-card-value">{data.summary.repo_count}개</div>
           <div className="summary-card-sub">
-            {data.summary.last_indexed_at
-              ? `마지막 인덱싱 ${new Date(data.summary.last_indexed_at).toLocaleDateString('ko-KR')}`
-              : '아직 인덱싱한 레포가 없습니다'}
+            {indexingNow > 0
+              ? `${indexingNow}개 인덱싱 진행 중`
+              : data.summary.last_indexed_at
+                ? `마지막 인덱싱 ${new Date(data.summary.last_indexed_at).toLocaleDateString('ko-KR')}`
+                : '아직 인덱싱한 레포가 없습니다'}
           </div>
         </div>
         <div className="summary-card">
