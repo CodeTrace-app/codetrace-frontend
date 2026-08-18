@@ -305,6 +305,7 @@ export const prWarnings: Paged<PrWarning> = {
   items: [
     {
       id: 8,
+      repo_id: 1,
       repo: 'acme-payment-service',
       pr_number: 132,
       pr_title: '결제 타임아웃 설정 변경',
@@ -327,6 +328,7 @@ export const prWarnings: Paged<PrWarning> = {
      * 경고 종류별 문구를 화면에서 확인해야 하기 때문이다. */
     {
       id: 7,
+      repo_id: 1,
       repo: 'acme-payment-service',
       pr_number: 128,
       pr_title: '사용하지 않는 정산 헬퍼 제거',
@@ -354,6 +356,7 @@ export const prWarnings: Paged<PrWarning> = {
     },
     {
       id: 6,
+      repo_id: 2,
       repo: 'acme-admin-web',
       pr_number: 96,
       pr_title: '결제 상태 유틸 이름 정리',

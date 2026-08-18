@@ -222,6 +222,8 @@ export interface Warning {
 
 export interface PrWarning {
   id: number
+  /** 탐색기 링크(?repo=)가 쓰는 값. 이름으로는 링크를 만들 수 없다 */
+  repo_id: number
   repo: string
   pr_number: number
   pr_title: string
