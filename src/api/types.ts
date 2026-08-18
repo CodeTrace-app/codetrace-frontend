@@ -79,8 +79,10 @@ export interface Repo {
   /** 표시용 대표 언어. 지원 언어 판별과는 무관하다 */
   language: string | null
   indexing_status: IndexingStatus
-  /** 진행 중일 때만 값이 있다. done·failed면 null */
-  progress: { current: number; total: number } | null
+  /** 진행 중일 때만 값이 있다. done·failed면 null.
+   *  label은 지금 무엇을 세고 있는지 — 한 상태 안에 단계가 여럿이라
+   *  이름 없이 퍼센트만 보이면 100%에서 0%로 되돌아가는 것처럼 보인다. */
+  progress: { current: number; total: number; label: string | null } | null
   last_indexed_at: string | null
   stats: RepoStats
 }
@@ -220,6 +222,8 @@ export interface Warning {
 
 export interface PrWarning {
   id: number
+  /** 탐색기 링크(?repo=)가 쓰는 값. 이름으로는 링크를 만들 수 없다 */
+  repo_id: number
   repo: string
   pr_number: number
   pr_title: string
