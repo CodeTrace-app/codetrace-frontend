@@ -31,6 +31,10 @@ export default function Explorer() {
   const [contextData, setContextData] = useState<FunctionContext | null>(null);
   const [impactData, setImpactData] = useState<ImpactGraph | null>(null);
 
+  // 커서 콜백은 마운트 때 한 번만 만들어져 그 시점의 fileData에 묶인다. ref로 최신값을 본다.
+  const symbolsRef = useRef<SourceFile['functions']>([]);
+  symbolsRef.current = fileData?.functions ?? [];
+
   const [isLoadingTree, setIsLoadingTree] = useState(false);
   const [isLoadingFile, setIsLoadingFile] = useState(false);
   const [isLoadingContext, setIsLoadingContext] = useState(false);
@@ -185,32 +189,29 @@ export default function Explorer() {
 
   const handleEditorDidMount: OnMount = (editor) => {
     editor.onDidChangeCursorPosition((e) => {
-      const model = editor.getModel();
-      if (!model) return;
-
       const lineNumber = e.position.lineNumber;
       setSelectedLine(lineNumber);
 
-      const minLine = Math.max(1, lineNumber - 100);
-      for (let line = lineNumber; line >= minLine; line--) {
-        const lineContent = model.getLineContent(line);
-        const match = lineContent.match(/def\s+([a-zA-Z0-9_]+)\s*\(/);
-        if (match && match[1]) {
-          const clickedFuncName = match[1];
-          const path = filePathRef.current;
-          const targetParam = `${path}::${clickedFuncName}`;
+      // 심볼은 서버가 준 범위로 판별한다. 본문을 정규식으로 긁으면 두 군데가 깨진다.
+      // ① "def"가 없는 TypeScript에서는 아무것도 잡지 못한다.
+      // ② 메서드에서 클래스가 빠진 이름이 나온다. 백엔드 식별자는
+      //    "AuthService.verify_token"이라 "verify_token"으로 물으면 그래프가 404다.
+      // 범위가 겹치면(클래스 안 메서드) 가장 안쪽 것으로 해석한다 (S-ZEZFED).
+      const enclosing = symbolsRef.current
+        .filter((fn) => fn.start_line <= lineNumber && lineNumber <= fn.end_line)
+        .sort((a, b) => b.start_line - a.start_line)[0];
 
-          setSearchParams((prev) => {
-            const next = new URLSearchParams(prev);
-            if (next.get('fn') !== targetParam) {
-              next.set('fn', targetParam);
-              return next;
-            }
-            return prev;
-          });
-          break;
-        }
-      }
+      // 어느 심볼에도 안 걸리면 fn을 건드리지 않는다. 여기서 경로만 남기면
+      // 파일 로드 쪽이 첫 함수로 되돌려놓아 방금 누른 자리가 튄다.
+      if (!enclosing) return;
+
+      const targetParam = `${filePathRef.current}::${enclosing.name}`;
+      setSearchParams((prev) => {
+        const next = new URLSearchParams(prev);
+        if (next.get('fn') === targetParam) return prev;
+        next.set('fn', targetParam);
+        return next;
+      });
     });
   };
 
