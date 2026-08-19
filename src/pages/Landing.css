@@ -1,5 +1,5 @@
 .landing-wrapper {
-  background-color: var(--color-surface);
+  background-color: var(--color-bg);
   width: 100%;
   margin: 0 auto;
   padding: 0 20px;
@@ -78,6 +78,8 @@
 }
 .card {
   flex: 1;
+  /* 페이지 배경이 회색이라 면을 직접 가져야 카드로 읽힌다 */
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 24px;
@@ -104,6 +106,7 @@
 }
 
 .table-container {
+  background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
