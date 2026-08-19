@@ -1,5 +1,5 @@
 .subscribe-container {
-  background-color: var(--color-bg);
+  background-color: var(--color-surface);
   width: 100%;
   min-height: 100vh;
   padding: 60px 20px;
