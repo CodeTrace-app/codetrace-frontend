@@ -1,5 +1,5 @@
 .auth {
-  background-color: var(--color-surface); 
+  background-color: var(--color-bg);
   width: 100%;
   min-height: 100vh;
   display: flex;
