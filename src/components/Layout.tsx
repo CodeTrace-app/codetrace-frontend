@@ -52,7 +52,7 @@ export default function Layout() {
 
         <nav className="layout__nav">
           {menu.map((item) => (
-            <NavLink key={item.to} to={item.to} className={navClass}>
+            <NavLink key={item.to} to={item.to} className={navClass} data-label={item.label}>
               {item.label}
             </NavLink>
           ))}

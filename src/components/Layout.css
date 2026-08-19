@@ -12,7 +12,11 @@
 }
 
 .layout__header {
-  display: flex;
+  /* 3칸 그리드다. flex + justify-content:center 로는 메뉴가 "남은 공간"의 가운데에
+   * 놓여서, 로고와 사용자 영역의 폭이 다른 만큼 화면 가운데에서 밀린다.
+   * 양옆을 같은 1fr 로 잡으면 가운데 칸이 화면 가운데에 정확히 온다. */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
   align-items: center;
   gap: var(--space-6);
   padding: 0 var(--space-5);
@@ -22,6 +26,7 @@
 }
 
 .layout__logo {
+  justify-self: start;
   font-size: var(--text-md);
   font-weight: var(--weight-bold);
   color: var(--color-primary);
@@ -29,13 +34,12 @@
   white-space: nowrap;
 }
 
-/* 메뉴는 가운데. 로고와 사용자 영역이 양끝을 잡는다 */
+/* 메뉴는 화면 가운데. 로고와 사용자 영역이 양끝을 잡는다 */
 .layout__nav {
+  justify-self: center;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: var(--space-4);
-  flex: 1;
 }
 
 .layout__nav-link {
@@ -43,6 +47,17 @@
   color: var(--color-text-muted);
   text-decoration: none;
   white-space: nowrap;
+}
+
+/* 현재 화면 항목이 굵어지면서 폭이 늘면 옆 항목들이 밀린다. 화면을 옮길 때마다
+ * 메뉴가 흔들려 보이므로, 굵은 상태의 폭을 미리 차지해 자리를 고정한다. */
+.layout__nav-link::after {
+  content: attr(data-label);
+  display: block;
+  height: 0;
+  overflow: hidden;
+  visibility: hidden;
+  font-weight: var(--weight-bold);
 }
 
 .layout__nav-link:hover {
@@ -56,6 +71,7 @@
 }
 
 .layout__user {
+  justify-self: end;
   display: flex;
   align-items: center;
   gap: var(--space-3);
