@@ -6,9 +6,21 @@ interface Props {
   onNavigateParent?: (parentPath: string) => void;
 }
 
-/** 작성 배경 자리에 무엇을 쓸지. status와 summary 조합이 네 가지다.
+/** 함수 밖을 클릭하면 백엔드가 파일 단위 맥락으로 답한다 (api-spec §4).
+ *
+ *  그때 function.name은 파일 이름이고, 심볼일 때는 심볼 이름이다. 심볼 이름에
+ *  확장자가 들어갈 수 없으므로 이 비교로 두 경우가 갈린다. 계약을 바꾸지 않고
+ *  구분할 수 있는 유일한 신호다 (ContextOut은 필드 6개 고정).
+ */
+function isFileLevel(data: FunctionContext) {
+  const base = data.function?.path?.split('/').pop();
+  return Boolean(base) && data.function?.name === base;
+}
+
+/** 작성 배경 자리에 무엇을 쓸지. status와 summary 조합이 다섯 가지다.
  *
  *  ok + 요약         정상
+ *  파일 단위          함수 밖을 골랐다. 파일 단위 요약은 만들지 않는다
  *  ok + 요약 없음     근거는 있는데 요약이 아직 없다 (생성 실패·중단)
  *  no_history        의미 있는 이력이 없다. 근거가 있어도 요약은 만들지 않는다
  *  conflicting       상반된 결정이 남아 있다
@@ -18,6 +30,20 @@ interface Props {
  */
 function describe(data: FunctionContext, evidenceCount: number) {
   if (data.summary) return { text: data.summary, tone: 'normal' as const };
+
+  // 파일 단위는 "아직 없다"가 아니라 "만들지 않는다"다. 요약은 함수 단위로만 만든다.
+  // 여기서 "아직"이라고 하면 기다리면 생길 것처럼 읽히는데 영원히 생기지 않는다.
+  if (isFileLevel(data)) {
+    return evidenceCount > 0
+      ? {
+          text: `함수 밖을 선택하셨습니다. 배경 요약은 함수 단위로 만들기 때문에 파일 전체에 대한 요약은 없습니다. 아래 근거 ${evidenceCount}건을 보시거나, 코드에서 함수를 선택해 주세요.`,
+          tone: 'muted' as const,
+        }
+      : {
+          text: '함수 밖을 선택하셨습니다. 이 파일에 연결된 변경 이력이 없습니다.',
+          tone: 'muted' as const,
+        };
+  }
 
   if (data.status === 'no_history') {
     return evidenceCount > 0
@@ -44,13 +70,15 @@ function describe(data: FunctionContext, evidenceCount: number) {
 export default function ContextTab({ data, onNavigateParent }: Props) {
   const evidence = data.evidence ?? [];
   const funcName = data.function?.name || '';
+  // 파일 이름에 괄호를 붙이면 함수처럼 보인다. audit.ts() 같은 것이 나온다.
+  const fileLevel = isFileLevel(data);
   const background = describe(data, evidence.length);
 
   return (
     <div className="context-tab-container">
       <div className="context-header">
         <span className="context-symbol-name">
-          {funcName ? `${funcName}()` : '함수 정보'}
+          {funcName ? (fileLevel ? funcName : `${funcName}()`) : '함수 정보'}
         </span>
         <span className="evidence-badge">근거 {evidence.length}건</span>
       </div>
