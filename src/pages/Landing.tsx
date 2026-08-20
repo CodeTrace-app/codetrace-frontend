@@ -48,7 +48,7 @@ export default function Landing() {
   return (
     <div className="landing-wrapper">
       <section className="hero-section">
-        <h1>래거시 코드, 이제 맥락까지 이해하세요.</h1>
+        <h1>레거시 코드, 이제 맥락까지 이해하세요.</h1>
         <p>커밋-PR 이력을 근거로 코드 작성 배경을 요약하고 영향 범위를 분석합니다. 신규 합류 개발자의 온보딩 시간을 단축하는 개발자 도구입니다.</p>
         <div className="button-group">
           <button 
@@ -70,7 +70,7 @@ export default function Landing() {
           <div className="card">
             <span className="card-tag">신규 합류 후 코드 맥락 파악</span>
             <h3>평균 3~4주 소요</h3>
-            <p>인터뷰에 응한 현직 개발자 8명 중 87%가 사수 문의를 대체할 도구가 없다고 응답했습니다.</p>
+            <p>인터뷰에 응한 현직 개발자 8명 중 7명이 사수 문의를 대체할 도구가 없다고 답했습니다.</p>
           </div>
           <div className="card">
             <span className="card-tag">AI 코딩 도구 한계</span>
