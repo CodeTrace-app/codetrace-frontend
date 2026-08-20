@@ -143,21 +143,31 @@
   color: var(--color-text);
 }
 
+/* 두 카드의 높이는 긴 쪽(영상)이 정한다. 세로 플렉스로 두고 버튼에 margin-top:auto를
+ * 주면, 짧은 쪽 카드의 버튼이 위로 떠 있지 않고 카드 바닥에 붙는다. */
 .demo-video-card, .demo-repo-card {
   flex: 1;
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 24px;
+  background-color: var(--color-surface);
+  min-width: 0;
 }
-.video-placeholder {
-  background-color: var(--color-surface-subtle, var(--color-bg));
+
+.demo-video {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
   border: 1px solid var(--color-border);
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
+  border-radius: 6px;
+  background: #000;
   margin-bottom: 20px;
+}
+
+.demo-repo-card .full-width {
+  margin-top: auto;
 }
 .demo-section h3 {
   font-size: 18px;

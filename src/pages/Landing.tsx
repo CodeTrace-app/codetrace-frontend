@@ -126,18 +126,26 @@ export default function Landing() {
 
 
       <section className="demo-section">
-        <h2>3분 시연으로 직접 확인하세요</h2>
+        <h2>2분 시연으로 직접 확인하세요</h2>
         <div className="demo-container">
           <div className="demo-video-card">
-            <div className="video-placeholder">시연 영상 썸네일</div>
-            <h3>3분 시연 영상</h3>
-            <p>동일한 레거시 코드에 범용 LLM과 코드 트레이스가 각각 어떻게 응답하는지 비교합니다.</p>
+            {/* 첫 프레임이 타이틀 카드라 별도 포스터 이미지를 두지 않는다 */}
+            <video className="demo-video" controls preload="metadata" playsInline>
+              <source src="/demo.mp4" type="video/mp4" />
+              브라우저가 영상을 재생하지 못합니다.
+              <a href="/demo.mp4">영상 내려받기</a>
+            </video>
+            <h3>2분 시연 영상</h3>
+            <p>
+              같은 함수를 git blame으로 볼 때와 코드 트레이스로 볼 때가 어떻게 다른지,
+              그리고 PR을 올렸을 때 무엇이 자동으로 경고되는지 보여드립니다.
+            </p>
           </div>
           <div className="demo-repo-card">
             <h3>데모 레포 체험</h3>
-            <p>2년차 커밋 이력이 담긴 샘플 레포를 로그인 없이 바로 탐색해 볼 수 있습니다.</p>
-            <button 
-              className="primary-btn full-width" 
+            <p>2년치 커밋 이력이 담긴 샘플 레포를 로그인 없이 바로 탐색해 볼 수 있습니다.</p>
+            <button
+              className="primary-btn full-width"
               onClick={handleDemo}
               disabled={entering}
             >
